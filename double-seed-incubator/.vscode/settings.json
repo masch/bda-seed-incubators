@@ -1,0 +1,5 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "FSharp.suggestGitignore": false,
+    "cmake.configureOnOpen": false
+}
