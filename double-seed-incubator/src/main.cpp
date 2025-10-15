@@ -82,7 +82,7 @@ class Log{
 Log TempLog1;
 Log TempLog2;
 
-void wifiSetup(char* ssid, char* passWifi){
+void wifiSetup(const char* ssid, const char* passWifi){
   int connStatus = 0;
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, passWifi);
