@@ -23,7 +23,7 @@
 DHT sensor(SEN, DHTTYPE);
 
 //WiFi Definitions
-const String apiUrl = "http://192.168.60.211:4000/bosquesdeagua";
+const String apiUrl = "";
 const String getTempUrl = apiUrl + "/v1/heladera/gettemp";
 const String updateTempUrl = apiUrl + "/v1/heladera/updatetemp";
 const String statusUrl = apiUrl + "/status";

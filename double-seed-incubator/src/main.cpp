@@ -28,7 +28,7 @@ DHT sensor1(S1, DHTTYPE);
 DHT sensor2(S2, DHTTYPE);
 
 // WiFi Definitions
-String apiUrl = "http://clientes.ideasmarketsoftware.com:4000/bosquesdeagua";
+String apiUrl = "";
 String getTemp1 = apiUrl + "/v1/heladera-doble-1/gettemp";
 String updateTemp1 = apiUrl + "/v1/heladera-doble-1/updatetemp";
 String getTemp2 = apiUrl + "/v1/heladera-doble-2/gettemp";

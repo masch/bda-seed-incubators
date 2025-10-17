@@ -5,6 +5,8 @@
 #include <SPI.h>
 #include <Wire.h>
 
+#include "env.h"
+#include "bosquesFramework.h"
 #include <WiFi.h>
 #include <NTPClient.h>
 #include <HTTPClient.h>
@@ -41,6 +43,9 @@ FirebaseConfig config;
 #define STORAGE_BUCKET_ID ""
 #define FIRMWARE_PATH ""
 
+// WiFi Definitions
+String apiUrl = "";
+bool offlineMode = true;
 bool taskCompleted = false;
 bool error = false;
 bool noWiFi = false;
@@ -71,31 +76,31 @@ class Log{
 
 Log TempLog;
 
-void wifiSetup(char* ssid, char* passWifi){
-  int connStatus = 0;
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, passWifi);
-  Serial.println("Conectando a Wifi");
-  delay (500);
-  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
-  delay (500);
-  for (int i=0; i<10; i++){
-    if (WiFi.status() != WL_CONNECTED) {
-      Serial.print('.');
-      delay (1000);
-    }
-    else{
-      Serial.println("Conectado al Wifi");
-      connStatus = 1;
-      break;
-    }
-  }
-  if (WiFi.status() != WL_CONNECTED){
-    Serial.println("Error al conectarse al WiFi");
-    noWiFi = true;
-  }
-  Serial.println(WiFi.localIP());
-}
+// void wifiSetup(char* ssid, char* passWifi){
+//   int connStatus = 0;
+//   WiFi.mode(WIFI_STA);
+//   WiFi.begin(ssid, passWifi);
+//   Serial.println("Conectando a Wifi");
+//   delay (500);
+//   Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+//   delay (500);
+//   for (int i=0; i<10; i++){
+//     if (WiFi.status() != WL_CONNECTED) {
+//       Serial.print('.');
+//       delay (1000);
+//     }
+//     else{
+//       Serial.println("Conectado al Wifi");
+//       connStatus = 1;
+//       break;
+//     }
+//   }
+//   if (WiFi.status() != WL_CONNECTED){
+//     Serial.println("Error al conectarse al WiFi");
+//     noWiFi = true;
+//   }
+//   Serial.println(WiFi.localIP());
+// }
 
 void sensorSetup(){
     uint8_t fault = tempReader.readFault();
@@ -242,23 +247,9 @@ void setup() {
   
   tempReader.begin(wires);
   sensorSetup();
-<<<<<<< Updated upstream
-  wifiSetup(ssid, wifiPass);
-  if (noWiFi == false){
-    digitalWrite(ERR, HIGH);
-  }
-  
-  firebaseSetup();
-  Firebase.begin(&config, &auth);
-  config.fcs.download_buffer_size = 2048;
-  Firebase.reconnectWiFi(true);
 
-  firstCicle = true;
-  timeClient.begin();
-  timeClient.setTimeOffset(-10800);
-=======
   noWiFi = wifiSetup(SSID, WIFIPASS);
-  modeSetup(apiUrl);
+  offlineMode = modeSetup(apiUrl);
 
   Serial.printf("Estados - WIFI: %s - ONLINE: %s",noWiFi,offlineMode);
 
@@ -275,7 +266,6 @@ void setup() {
   }
   
   Serial.printf("Firebase status: %s - Task: %s",Firebase.ready(), !taskCompleted);
->>>>>>> Stashed changes
 
   if (Firebase.ready() && !taskCompleted)
   {
