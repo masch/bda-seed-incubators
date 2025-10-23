@@ -1,14 +1,15 @@
 #ifndef _ENV_H
 #define _ENV_H
 
-String API_KEY = "";
-String USER_EMAIL = "";
-String USER_PASSWORD = "";
-String FIRMWARE_PATH = "";
-String STORAGE_BUCKET_ID = "";
-char *SSID = "";
-char *WIFIPASS = "";
+const char *API_KEY = API_KEY_MACRO;
+const char *API_URL = API_URL_MACRO;
+const char *USER_EMAIL = USER_EMAIL_MACRO;
+const char *USER_PASSWORD = USER_PASSWORD_MACRO;
+const char *FIRMWARE_PATH = FIRMWARE_PATH_MACRO;
+const char *STORAGE_BUCKET_ID = STORAGE_BUCKET_ID_MACRO;
+const char *SSID = SSID_MACRO;
+const char *WIFIPASS = WIFIPASS_MACRO;
 
-String FIRMWARE_VERSION = "2.0";
+const char *FIRMWARE_VERSION = FIRMWARE_VERSION_MACRO;
 
 #endif

@@ -8,7 +8,7 @@
 HTTPClient http;
 
 //Regresa bool invertido basado en conexion a red WiFi
-bool wifiSetup(char* ssid, char* passWifi){
+bool wifiSetup(const char* ssid, const char* passWifi){
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, passWifi);
   Serial.println("Conectando a WiFi");

@@ -30,7 +30,7 @@ double temperature;
 float RREF = 430.0;
 
 // WiFi Definitions
-String apiUrl = "";
+String apiUrl = API_URL_MACRO;
 String getTempUrl = apiUrl + "/v1/horno/gettemp";
 String updateTempUrl = apiUrl + "/v1/horno/updatetemp";
 const String statusUrl = apiUrl + "/status";
