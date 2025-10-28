@@ -12,7 +12,7 @@ bool wifiSetup(const char *ssid, const char *passWifi)
 {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, passWifi);
-  Serial.println("Conectando a WiFi" + String(ssid) + " ...");
+  Serial.printf("Conectando a WiFi: %s ...\n", ssid);
 
   for (int i = 0; i < 10; i++)
   {
