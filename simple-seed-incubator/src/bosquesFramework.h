@@ -48,7 +48,7 @@ bool modeSetup(String url)
   http.begin(url.c_str());
   unsigned long timeoutStart = millis();
 
-  Serial.println("Verificando conexion a Internet:... " + url);
+  Serial.printf("Verificando conexion a Internet:... %s\n", url.c_str());
 
   while (http.connected() &&
          (millis() - timeoutStart) < kNetworkTimeout)
