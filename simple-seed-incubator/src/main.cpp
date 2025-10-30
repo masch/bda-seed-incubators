@@ -95,7 +95,7 @@ void readTemp()
 {
   temp = sensor.readTemperature();
   temperature = temp;
-  Serial.printf("INFO - Temperatura detectada sensor: %f\n", temperature);
+  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature);
 }
 
 // Rutina de control
@@ -103,7 +103,7 @@ void controlTemp(float minHela, float maxHela, float minLamp, float maxLamp, flo
 {
   if (isnan(tempNow))
   {
-    Serial.println("Temperatura leida invalida Heladera\n");
+    Serial.println("\t Temperatura leida invalida Heladera");
   }
   else
   {
@@ -129,7 +129,6 @@ void controlTemp(float minHela, float maxHela, float minLamp, float maxLamp, flo
         }
       }
     }
-
     else if (tempNow <= minLamp)
     {
       if (tempNow <= maxLamp)

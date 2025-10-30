@@ -48,7 +48,7 @@ bool modeSetup(String url)
   http.begin(url.c_str());
   unsigned long timeoutStart = millis();
 
-  Serial.printf("Verificando conexion a Internet:... %s\n", url.c_str());
+  Serial.printf("\n\nVerificando conexion a Internet:... %s\r\n", url.c_str());
 
   while (http.connected() &&
          (millis() - timeoutStart) < kNetworkTimeout)
@@ -91,7 +91,7 @@ float getServerTemp(String url, float setTemp)
     Serial.println("Error: ");
     Serial.printf("%i \n", responseCode);
   }
-  Serial.printf("CONTROL - Temperatura leida del Servidor: %f // \n ", serverTemp);
+  Serial.printf("CONTROL - Temperatura leida del Servidor: %f \r\n", serverTemp);
   http.end();
   return serverTemp;
 }
