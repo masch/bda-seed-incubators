@@ -8,9 +8,9 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <Update.h>
-#include <Firebase_ESP_Client.h>
 #include <floatToString.h>
 #include "addons/TokenHelper.h"
+#include "firmware.h"
 
 // Pin definitons
 #define SEN 18
@@ -29,10 +29,8 @@ const String updateTempUrl = apiUrl + "/v1/heladera/updatetemp";
 const String statusUrl = apiUrl + "/status";
 static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
-// Firebase Definitions
-FirebaseData fbdo;
-FirebaseAuth auth;
-FirebaseConfig config;
+// Current firmware version
+#define CURRENT_FIRMWARE_VERSION "3.0.2"
 
 // Flags
 bool taskCompleted = false;
@@ -58,36 +56,6 @@ float temp;
 void sensorSetup()
 {
   sensor.begin();
-}
-
-void firmwareDownload(FCS_DownloadStatusInfo info)
-{
-  if (info.status == fb_esp_fcs_download_status_init)
-  {
-    Serial.printf("New update found\n");
-    Serial.printf("Downloading firmware %s (%d bytes)\n", info.remoteFileName.c_str(), info.fileSize);
-  }
-  else if (info.status == fb_esp_fcs_download_status_download)
-  {
-    Serial.printf("Downloaded %d%s\n", (int)info.progress, "%");
-  }
-  else if (info.status == fb_esp_fcs_download_status_complete)
-  {
-    Serial.println("Donwload firmware completed.");
-    Serial.println();
-  }
-  else if (info.status == fb_esp_fcs_download_status_error)
-  {
-    Serial.printf("New firmware update not available or download failed, %s\n", info.errorMsg.c_str());
-  }
-}
-
-void firebaseSetup()
-{
-  config.api_key = API_KEY;
-  auth.user.email = USER_EMAIL;
-  auth.user.password = USER_PASSWORD;
-  config.token_status_callback = tokenStatusCallback;
 }
 
 // Lee temp del sensor/sensores
@@ -198,6 +166,11 @@ void subRoutineInternet(void *params)
         setTemp = getServerTemp(urls[1], setTemp);
         tempsUpdate(setTemp);
         updateServerTemp(urls[2], temperature);
+        // if there is a new update, download it
+        if (checkForUpdate(CURRENT_FIRMWARE_VERSION))
+        {
+          downloadAndUpdateFirmware();
+        }
       }
     }
   }
@@ -214,41 +187,12 @@ void setup()
   digitalWrite(VEN, HIGH);
   digitalWrite(HEL, HIGH);
 
-  Serial.printf("Firmware v%s\n", FIRMWARE_VERSION);
-  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+  Serial.printf("Firmware v%s\r\n", CURRENT_FIRMWARE_VERSION);
 
   sensorSetup();
   noWiFi = wifiSetup(SSID, WIFIPASS);
   modeSetup(apiUrl);
-
-  if (!noWiFi)
-  {
-    firebaseSetup();
-    Firebase.begin(&config, &auth);
-    config.fcs.download_buffer_size = 2048;
-    Firebase.reconnectWiFi(true);
-  }
-
-  if (Firebase.ready() && !taskCompleted)
-  {
-    taskCompleted = true;
-    Serial.println("\nChecking for new firmware update available...\n");
-
-    if (!Firebase.Storage.downloadOTA(
-            &fbdo, STORAGE_BUCKET_ID,
-            FIRMWARE_PATH,
-            firmwareDownload))
-    {
-      Serial.println(fbdo.errorReason());
-    }
-    else
-    {
-      Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo, STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
-      Serial.println("Restarting...\n\n");
-      delay(2000);
-      ESP.restart();
-    }
-  }
+  firebaseSetup();
 
   xTaskCreatePinnedToCore(
       subRoutineInternet,

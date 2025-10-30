@@ -12,7 +12,7 @@ bool wifiSetup(const char *ssid, const char *passWifi)
 {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, passWifi);
-  Serial.printf("Conectando a WiFi: %s ...\n", ssid);
+  Serial.printf("Conectando a WiFi: %s ...\r\n", ssid);
 
   for (int i = 0; i < 10; i++)
   {
@@ -89,7 +89,7 @@ float getServerTemp(String url, float setTemp)
   else
   {
     Serial.println("Error: ");
-    Serial.printf("%i \n", responseCode);
+    Serial.printf("%i \r\n", responseCode);
   }
   Serial.printf("CONTROL - Temperatura leida del Servidor: %f \r\n", serverTemp);
   http.end();
