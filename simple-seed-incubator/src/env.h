@@ -1,9 +1,9 @@
 #ifndef _ENV_H
 #define _ENV_H
 
-const char *API_URL = API_URL_MACRO;
-const char *SSID = SSID_MACRO;
-const char *WIFIPASS = WIFIPASS_MACRO;
+const char *BDA_API_URL = BDA_API_URL_MACRO;
+const char *WIFI_SSID = WIFI_SSID_MACRO;
+const char *WIFI_PASSWORD = WIFI_PASSWORD_MACRO;
 
 const char *FIREBASE_API_KEY = FIREBASE_API_KEY_MACRO;
 const char *FIREBASE_USER_EMAIL = FIREBASE_USER_EMAIL_MACRO;

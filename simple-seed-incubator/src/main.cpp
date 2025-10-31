@@ -23,14 +23,14 @@
 DHT sensor(SEN, DHTTYPE);
 
 // WiFi Definitions
-const String apiUrl = API_URL;
-const String getTempUrl = apiUrl + "/v1/heladera/gettemp";
-const String updateTempUrl = apiUrl + "/v1/heladera/updatetemp";
-const String statusUrl = apiUrl + "/status";
+const String bdaApiURL = BDA_API_URL;
+const String getTempUrl = bdaApiURL + "/v1/heladera/gettemp";
+const String updateTempUrl = bdaApiURL + "/v1/heladera/updatetemp";
+const String statusUrl = bdaApiURL + "/status";
 static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
 // Current firmware version
-#define CURRENT_FIRMWARE_VERSION "3.0.2"
+#define CURRENT_FIRMWARE_VERSION "3.0.3"
 
 // Flags
 bool taskCompleted = false;
@@ -155,7 +155,7 @@ void subRoutineInternet(void *params)
       offlineMode = true;
       Serial.println("Sin WiFi, reconectando. ");
       vTaskDelay(5000);
-      wifiSetup(SSID, WIFIPASS);
+      wifiSetup(WIFI_SSID, WIFI_PASSWORD);
     }
     else
     {
@@ -190,8 +190,8 @@ void setup()
   Serial.printf("Firmware v%s\r\n", CURRENT_FIRMWARE_VERSION);
 
   sensorSetup();
-  noWiFi = wifiSetup(SSID, WIFIPASS);
-  modeSetup(apiUrl);
+  noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
+  modeSetup(bdaApiURL);
   firebaseSetup();
 
   xTaskCreatePinnedToCore(
