@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <DHT.h>
 #include <math.h>
-#include <env.h>
+#include <bda/env.h>
+#include <bda/firmware.h>
+#include <bda/network.h>
 
 #include <WiFi.h>
 #include <NTPClient.h>
@@ -28,18 +30,22 @@ DHT sensor1(S1, DHTTYPE);
 DHT sensor2(S2, DHTTYPE);
 
 // WiFi Definitions
-String apiUrl = "";
-String getTemp1 = apiUrl + "/v1/heladera-doble-1/gettemp";
-String updateTemp1 = apiUrl + "/v1/heladera-doble-1/updatetemp";
-String getTemp2 = apiUrl + "/v1/heladera-doble-2/gettemp";
-String updateTemp2 = apiUrl + "/v1/heladera-doble-2/updatetemp";
+const String bdaApiURL = BDA_API_URL;
+String getTemp1 = bdaApiURL + "/v1/heladera-doble-1/gettemp";
+String updateTemp1 = bdaApiURL + "/v1/heladera-doble-1/updatetemp";
+String getTemp2 = bdaApiURL + "/v1/heladera-doble-2/gettemp";
+String updateTemp2 = bdaApiURL + "/v1/heladera-doble-2/updatetemp";
 HTTPClient http;
 unsigned long lastMillis;
 
+// Current firmware information
+#define DEVICE_NAME "double-seed-incubator"
+#define CURRENT_FIRMWARE_VERSION "3.0.0"
+
 // Firebase Definitions
-FirebaseData fbdo;
-FirebaseAuth auth;
-FirebaseConfig config;
+// FirebaseData fbdo;
+// FirebaseAuth auth;
+// FirebaseConfig config;
 
 // Flags
 bool taskCompleted = false;
@@ -83,7 +89,7 @@ public:
 Log TempLog1;
 Log TempLog2;
 
-void wifiSetup(const char *ssid, const char *passWifi)
+/*void wifiSetup(const char *ssid, const char *passWifi)
 {
   int connStatus = 0;
   WiFi.mode(WIFI_STA);
@@ -112,7 +118,7 @@ void wifiSetup(const char *ssid, const char *passWifi)
     noWiFi = true;
   }
   Serial.println(WiFi.localIP());
-}
+}*/
 
 void sensorSetup()
 {
@@ -142,13 +148,13 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
   }
 }
 
-void firebaseSetup()
-{
-  config.api_key = API_KEY;
-  auth.user.email = USER_EMAIL;
-  auth.user.password = USER_PASSWORD;
-  config.token_status_callback = tokenStatusCallback;
-}
+// void firebaseSetup()
+// {
+//   config.api_key = API_KEY;
+//   auth.user.email = USER_EMAIL;
+//   auth.user.password = USER_PASSWORD;
+//   config.token_status_callback = tokenStatusCallback;
+// }
 
 void readTemp1()
 {
@@ -427,40 +433,40 @@ void setup()
   digitalWrite(VEN2, HIGH);
   digitalWrite(HEL2, HIGH);
 
-  Serial.printf("Firmware v%s\n", FIRMWARE_VERSION);
+  Serial.printf("Firmware v%s\r\n", CURRENT_FIRMWARE_VERSION);
 
   sensorSetup();
-  wifiSetup(SSID, WIFIPASS);
-  modeSetup(apiUrl);
-
+  noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
+  modeSetup(bdaApiURL);
   firebaseSetup();
-  Firebase.begin(&config, &auth);
-  config.fcs.download_buffer_size = 2048;
-  Firebase.reconnectWiFi(true);
 
-  timeClient.begin();
-  timeClient.setTimeOffset(-10800);
+  // Firebase.begin(&config, &auth);
+  // config.fcs.download_buffer_size = 2048;
+  // Firebase.reconnectWiFi(true);
 
-  if (Firebase.ready() && !taskCompleted)
-  {
-    taskCompleted = true;
-    Serial.println("\nChecking for new firmware update available...\n");
+  // timeClient.begin();
+  // timeClient.setTimeOffset(-10800);
 
-    if (!Firebase.Storage.downloadOTA(
-            &fbdo, STORAGE_BUCKET_ID,
-            FIRMWARE_PATH,
-            firmwareDownload))
-    {
-      Serial.println(fbdo.errorReason());
-    }
-    else
-    {
-      Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo, STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
-      Serial.println("Restarting...\n\n");
-      delay(2000);
-      ESP.restart();
-    }
-  }
+  // if (Firebase.ready() && !taskCompleted)
+  // {
+  //   taskCompleted = true;
+  //   Serial.println("\nChecking for new firmware update available...\n");
+
+  //   if (!Firebase.Storage.downloadOTA(
+  //           &fbdo, STORAGE_BUCKET_ID,
+  //           FIRMWARE_PATH,
+  //           firmwareDownload))
+  //   {
+  //     Serial.println(fbdo.errorReason());
+  //   }
+  //   else
+  //   {
+  //     Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo, STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
+  //     Serial.println("Restarting...\n\n");
+  //     delay(2000);
+  //     ESP.restart();
+  //   }
+  // }
 
   /*if(!offlineMode){
    xTaskCreatePinnedToCore (
@@ -482,6 +488,11 @@ void loop()
     if (offlineMode == false)
     {
       subRoutine1Online();
+      // if there is a new update, download it
+      if (checkForUpdate(DEVICE_NAME, CURRENT_FIRMWARE_VERSION))
+      {
+        downloadAndUpdateFirmware();
+      }
     }
     else
     {

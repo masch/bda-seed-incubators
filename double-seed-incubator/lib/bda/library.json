@@ -1,0 +1,10 @@
+{
+    "name": "bda",
+    "version": "1.0.0",
+    "description": "A private library for BDA framework",
+    "keywords": "bda",
+    "authors": {
+        "name": "user"
+    },
+    "license": "MIT"
+}
