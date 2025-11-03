@@ -24,12 +24,18 @@ void firebaseSetup()
     Firebase.reconnectWiFi(true);
 }
 
-bool checkForUpdate(const char *currentFirmwareVersion)
+bool checkForUpdate(const char *deviceId, const char *currentFirmwareVersion)
 {
     if (Firebase.ready())
     {
-        // Read Available update Version Number
-        if (Firebase.RTDB.getString(&fbdo, "/update/version"))
+        // Read Available update Version Number for the device
+        String devicePath = String("/devices/");
+        devicePath.concat(deviceId);
+        devicePath.concat("/update/");
+
+        String deviceVersionPath = devicePath;
+        deviceVersionPath.concat("version");
+        if (Firebase.RTDB.getString(&fbdo, deviceVersionPath))
         {
             Update_Version = fbdo.stringData();
             Serial.printf(" ********************Latest version: %s********************\r\n", Update_Version.c_str());
@@ -41,7 +47,9 @@ bool checkForUpdate(const char *currentFirmwareVersion)
             {
                 Serial.printf("********************New version available: %s ********************\r\n", Update_Version.c_str());
                 // Read update URL
-                if (Firebase.RTDB.getString(&fbdo, "/update/url"))
+                String deviceURLPath = devicePath;
+                deviceURLPath.concat("url");
+                if (Firebase.RTDB.getString(&fbdo, deviceURLPath))
                 {
                     Firebase_Firmware_Update_URL = fbdo.stringData();
                     Serial.println(Firebase_Firmware_Update_URL);

@@ -29,8 +29,9 @@ const String updateTempUrl = bdaApiURL + "/v1/heladera/updatetemp";
 const String statusUrl = bdaApiURL + "/status";
 static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
-// Current firmware version
-#define CURRENT_FIRMWARE_VERSION "3.0.3"
+// Current firmware information
+#define DEVICE_NAME "simple-seed-incubator"
+#define CURRENT_FIRMWARE_VERSION "3.0.6"
 
 // Flags
 bool taskCompleted = false;
@@ -167,7 +168,7 @@ void subRoutineInternet(void *params)
         tempsUpdate(setTemp);
         updateServerTemp(urls[2], temperature);
         // if there is a new update, download it
-        if (checkForUpdate(CURRENT_FIRMWARE_VERSION))
+        if (checkForUpdate(DEVICE_NAME, CURRENT_FIRMWARE_VERSION))
         {
           downloadAndUpdateFirmware();
         }
