@@ -31,7 +31,7 @@ static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
 // Current firmware information
 #define DEVICE_NAME "simple-seed-incubator"
-#define CURRENT_FIRMWARE_VERSION "3.0.6"
+#define CURRENT_FIRMWARE_VERSION "3.0.8"
 
 // Flags
 bool taskCompleted = false;

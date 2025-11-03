@@ -38,12 +38,13 @@ bool checkForUpdate(const char *deviceId, const char *currentFirmwareVersion)
         if (Firebase.RTDB.getString(&fbdo, deviceVersionPath))
         {
             Update_Version = fbdo.stringData();
+            Serial.printf(" ********************Current version: %s********************\r\n", currentFirmwareVersion);
             Serial.printf(" ********************Latest version: %s********************\r\n", Update_Version.c_str());
 
             char update_version = Update_Version.compareTo(currentFirmwareVersion);
 
-            // if Version Higher than current version
-            if (update_version > 0)
+            // if version doesn't match update with cloud version
+            if (update_version != 0)
             {
                 Serial.printf("********************New version available: %s ********************\r\n", Update_Version.c_str());
                 // Read update URL
@@ -60,13 +61,9 @@ bool checkForUpdate(const char *deviceId, const char *currentFirmwareVersion)
                     Serial.printf("********************Firebase.RTDB error %s ********************\r\n", fbdo.errorReason().c_str());
                 }
             }
-            else if (0 == update_version)
-            {
-                Serial.println("********************Application is Up To Date********************");
-            }
             else
             {
-                Serial.println("********************Firebase version is old!********************");
+                Serial.println("********************Application is Up To Date********************");
             }
         }
         else
