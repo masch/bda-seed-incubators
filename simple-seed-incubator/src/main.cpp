@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <DHT.h>
 #include <math.h>
-#include <env.h>
+#include <bda/env.h>
+#include "bda/firmware.h"
 #include <bosquesFramework.h>
 
 #include <WiFi.h>
@@ -10,7 +11,6 @@
 #include <Update.h>
 #include <floatToString.h>
 #include "addons/TokenHelper.h"
-#include "firmware.h"
 
 // Pin definitons
 #define SEN 18
@@ -31,7 +31,7 @@ static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
 // Current firmware information
 #define DEVICE_NAME "simple-seed-incubator"
-#define CURRENT_FIRMWARE_VERSION "3.0.8"
+#define CURRENT_FIRMWARE_VERSION "3.0.9"
 
 // Flags
 bool taskCompleted = false;
