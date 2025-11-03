@@ -3,7 +3,8 @@
 #include <DHT.h>
 #include <math.h>
 #include <bda/env.h>
-#include "bda/firmware.h"
+#include <bda/firmware.h>
+#include <bda/network.h>
 #include <bosquesFramework.h>
 
 #include <WiFi.h>
@@ -31,7 +32,7 @@ static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
 // Current firmware information
 #define DEVICE_NAME "simple-seed-incubator"
-#define CURRENT_FIRMWARE_VERSION "3.0.9"
+#define CURRENT_FIRMWARE_VERSION "3.0.10"
 
 // Flags
 bool taskCompleted = false;
