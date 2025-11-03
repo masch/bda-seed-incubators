@@ -12,7 +12,7 @@ clean:
 rebuild: clean build
 
 upload:
-	killall tio && pio run -t upload -e nodemcu-32s
+	killall tio & pio run -t upload -e nodemcu-32s && tio /dev/ttyUSB0 -b 115200
 
 kill-tio:
 	killall tio	
