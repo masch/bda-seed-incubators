@@ -1,3 +1,4 @@
 **/.pio/
 **/.vscode/
 **/private_config.ini
+**/.gitignore
