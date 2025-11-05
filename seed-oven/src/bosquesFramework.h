@@ -5,6 +5,7 @@
 #include <HTTPClient.h>
 #include <floatToString.h>
 
+/*
 HTTPClient http;
 
 //Regresa bool invertido basado en conexion a red WiFi
@@ -34,7 +35,7 @@ bool wifiSetup(const char* ssid, const char* passWifi){
   Serial.println(WiFi.localIP());
 }
 
-/*
+
 //Checkeo de conexion a internet
 bool modeSetup (String url){
   const int kNetworkTimeout = 2000;
@@ -64,10 +65,10 @@ bool modeSetup (String url){
 }
 
 //Devuelve temp seteada en servidor
-float getServerTemp(String url, float setTemp){  
+float getServerTemp(String url, float setTemp){
   float serverTemp = setTemp;
 
-    http.begin(url.c_str());  
+    http.begin(url.c_str());
     int responseCode = http.GET();
     String responseTemp = http.getString();
 
@@ -91,7 +92,7 @@ void updateServerTemp(String url, float newtemp){
     http.begin(url.c_str());
     http.addHeader("temp", sentTemp);
     int responseCode = http.POST("");
-    
+
     if (responseCode == 200){
       Serial.println("Temperatura enviada correctamente a servidor");
     }

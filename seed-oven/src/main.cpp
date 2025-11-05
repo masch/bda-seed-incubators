@@ -4,8 +4,10 @@
 #include <math.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <env.h>
-#include <bosquesFramework.h>
+// #include <env.h>
+// #include <bosquesFramework.h>
+#include <bda/firmware.h>
+#include <bda/network.h>
 
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -30,16 +32,17 @@ double temperature;
 float RREF = 430.0;
 
 // WiFi Definitions
-String apiUrl = API_URL_MACRO;
-String getTempUrl = apiUrl + "/v1/horno/gettemp";
-String updateTempUrl = apiUrl + "/v1/horno/updatetemp";
-const String statusUrl = apiUrl + "/status";
+const String bdaApiURL = BDA_API_URL;
+const String getTempUrl = bdaApiURL + "/v1/horno/gettemp";
+const String updateTempUrl = bdaApiURL + "/v1/horno/updatetemp";
+const String statusUrl = bdaApiURL + "/status";
 static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
 // Firebase Definitions
-FirebaseData fbdo;
+/*FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
+*/
 
 // Flags
 bool taskCompleted = false;
@@ -59,6 +62,10 @@ int rampTreshold = setTemp - 3;
 Adafruit_MAX31865 tempReader = Adafruit_MAX31865(27, 23, 19, 18);
 max31865_fault_cycle_t maxFault = MAX31865_FAULT_AUTO;
 max31865_numwires_t wires = MAX31865_3WIRE;
+
+// Current firmware information
+#define DEVICE_NAME "oven-seed-incubator"
+#define CURRENT_FIRMWARE_VERSION "3.0.0"
 
 void sensorSetup()
 {
@@ -138,14 +145,14 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
   }
 }
 
-void firebaseSetup()
+/*void firebaseSetup()
 {
   config.api_key = API_KEY;
   auth.user.email = USER_EMAIL;
   auth.user.password = USER_PASSWORD;
   config.token_status_callback = tokenStatusCallback;
   config.max_token_generation_retry = 5;
-}
+}*/
 
 void readTemp()
 {
@@ -236,7 +243,7 @@ void subRoutineInternet(void *params)
       offlineMode = true;
       Serial.println("Sin WiFi, reconectando. ");
       vTaskDelay(5000);
-      wifiSetup(SSID, WIFIPASS);
+      wifiSetup(WIFI_SSID, WIFI_PASSWORD);
     }
     else
     {
@@ -247,6 +254,11 @@ void subRoutineInternet(void *params)
         setTemp = getServerTemp(urls[1], setTemp);
         tempsUpdate(setTemp);
         updateServerTemp(urls[2], temperature);
+        // if there is a new update, download it
+        if (checkForUpdate(DEVICE_NAME, CURRENT_FIRMWARE_VERSION))
+        {
+          downloadAndUpdateFirmware();
+        }
       }
     }
   }
@@ -264,13 +276,13 @@ void setup()
   pinMode(ERR, OUTPUT);
 
   Serial.println("Horno de Semillas");
-  Serial.printf("Firmware v%s\n", FIRMWARE_VERSION);
-  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+  Serial.printf("Firmware v%s\n", CURRENT_FIRMWARE_VERSION);
 
   tempReader.begin(wires);
+
   sensorSetup();
-  noWiFi = wifiSetup(SSID, WIFIPASS);
-  modeSetup(apiUrl);
+  noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
+  modeSetup(bdaApiURL);
 
   if (!noWiFi)
   {
@@ -284,7 +296,7 @@ void setup()
     }
   }
 
-  if (Firebase.ready() && !taskCompleted)
+  /*if (Firebase.ready() && !taskCompleted)
   {
     taskCompleted = true;
     Serial.println("\nChecking for new firmware update available...\n");
@@ -303,7 +315,7 @@ void setup()
       delay(2000);
       ESP.restart();
     }
-  }
+  }*/
 
   xTaskCreatePinnedToCore(
       subRoutineInternet,
