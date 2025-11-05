@@ -1,5 +1,5 @@
-#ifndef _ENV_H
-#define _ENV_H
+#ifndef _BDA_ENV_H
+#define _BDA_ENV_H
 
 const char *BDA_API_URL = BDA_API_URL_MACRO;
 const char *WIFI_SSID = WIFI_SSID_MACRO;
@@ -10,4 +10,4 @@ const char *FIREBASE_USER_EMAIL = FIREBASE_USER_EMAIL_MACRO;
 const char *FIREBASE_RTDB_URL = FIREBASE_RTDB_URL_MACRO;
 const char *FIREBASE_USER_PASSWORD = FIREBASE_USER_PASSWORD_MACRO;
 
-#endif
+#endif // _BDA_ENV_H

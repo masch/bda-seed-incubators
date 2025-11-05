@@ -35,7 +35,7 @@ String getTemp1 = bdaApiURL + "/v1/heladera-doble-1/gettemp";
 String updateTemp1 = bdaApiURL + "/v1/heladera-doble-1/updatetemp";
 String getTemp2 = bdaApiURL + "/v1/heladera-doble-2/gettemp";
 String updateTemp2 = bdaApiURL + "/v1/heladera-doble-2/updatetemp";
-HTTPClient http;
+
 unsigned long lastMillis;
 
 // Current firmware information
@@ -298,6 +298,7 @@ void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp, fl
   }
 }
 
+/*
 float getServerTemp(String url, float setTemp)
 {
   float serverTemp = setTemp;
@@ -357,6 +358,7 @@ void modeSetup(String url)
   }
   http.end();
 }
+*/
 
 void tempsUpdate(float tempNow1, float tempNow2)
 {

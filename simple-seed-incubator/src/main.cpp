@@ -5,7 +5,7 @@
 #include <bda/env.h>
 #include <bda/firmware.h>
 #include <bda/network.h>
-#include <bosquesFramework.h>
+// #include <bosquesFramework.h>
 
 #include <WiFi.h>
 #include <HTTPClient.h>

@@ -34,6 +34,7 @@ bool wifiSetup(const char* ssid, const char* passWifi){
   Serial.println(WiFi.localIP());
 }
 
+/*
 //Checkeo de conexion a internet
 bool modeSetup (String url){
   const int kNetworkTimeout = 2000;
@@ -102,4 +103,5 @@ void updateServerTemp(String url, float newtemp){
     http.end();
 }
 
+*/
 #endif
