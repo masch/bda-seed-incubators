@@ -5,6 +5,7 @@
 #include <HTTPClient.h>
 #include <floatToString.h>
 
+/*
 HTTPClient http;
 
 // Checkeo de conexion a internet
@@ -86,5 +87,6 @@ void updateServerTemp(String url, float newtemp)
   }
   http.end();
 }
+*/
 
 #endif

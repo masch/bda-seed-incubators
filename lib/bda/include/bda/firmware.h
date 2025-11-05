@@ -1,3 +1,6 @@
+#ifndef _BDA_FIRMWARE_H
+#define _BDA_FIRMWARE_H
+
 #include <bda/env.h>
 #include <HTTPClient.h>
 #include <Firebase_ESP_Client.h>
@@ -130,3 +133,5 @@ void downloadAndUpdateFirmware()
 
     http.end();
 }
+
+#endif // _BDA_NETWORK_H
