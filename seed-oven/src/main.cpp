@@ -63,10 +63,6 @@ Adafruit_MAX31865 tempReader = Adafruit_MAX31865(27, 23, 19, 18);
 max31865_fault_cycle_t maxFault = MAX31865_FAULT_AUTO;
 max31865_numwires_t wires = MAX31865_3WIRE;
 
-// Current firmware information
-#define DEVICE_NAME "oven-seed-incubator"
-#define CURRENT_FIRMWARE_VERSION "3.0.0"
-
 void sensorSetup()
 {
   uint8_t fault = tempReader.readFault();
@@ -255,7 +251,7 @@ void subRoutineInternet(void *params)
         tempsUpdate(setTemp);
         updateServerTemp(urls[2], temperature);
         // if there is a new update, download it
-        if (checkForUpdate(DEVICE_NAME, CURRENT_FIRMWARE_VERSION))
+        if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
         {
           downloadAndUpdateFirmware();
         }
@@ -276,7 +272,7 @@ void setup()
   pinMode(ERR, OUTPUT);
 
   Serial.println("Horno de Semillas");
-  Serial.printf("Firmware v%s\n", CURRENT_FIRMWARE_VERSION);
+  Serial.printf("Firmware v%s\n", FIRMWARE_VERSION);
 
   tempReader.begin(wires);
 

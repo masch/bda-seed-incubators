@@ -30,10 +30,6 @@ const String updateTempUrl = bdaApiURL + "/v1/heladera/updatetemp";
 const String statusUrl = bdaApiURL + "/status";
 static String taskParams[3] = {statusUrl, getTempUrl, updateTempUrl};
 
-// Current firmware information
-#define DEVICE_NAME "simple-seed-incubator"
-#define CURRENT_FIRMWARE_VERSION "3.0.10"
-
 // Flags
 bool taskCompleted = false;
 bool error = false;
@@ -169,7 +165,7 @@ void subRoutineInternet(void *params)
         tempsUpdate(setTemp);
         updateServerTemp(urls[2], temperature);
         // if there is a new update, download it
-        if (checkForUpdate(DEVICE_NAME, CURRENT_FIRMWARE_VERSION))
+        if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
         {
           downloadAndUpdateFirmware();
         }
@@ -189,7 +185,7 @@ void setup()
   digitalWrite(VEN, HIGH);
   digitalWrite(HEL, HIGH);
 
-  Serial.printf("Firmware v%s\r\n", CURRENT_FIRMWARE_VERSION);
+  Serial.printf("Firmware v%s\r\n", FIRMWARE_VERSION);
 
   sensorSetup();
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
