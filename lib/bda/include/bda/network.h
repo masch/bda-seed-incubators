@@ -36,7 +36,7 @@ bool wifiSetup(const char *ssid, const char *passWifi)
         return true;
     }
 
-    Serial.println(WiFi.localIP());
+    // Serial.println(WiFi.localIP());
 }
 
 // Check internet connection

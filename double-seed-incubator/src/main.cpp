@@ -38,10 +38,6 @@ String updateTemp2 = bdaApiURL + "/v1/heladera-doble-2/updatetemp";
 
 unsigned long lastMillis;
 
-// Current firmware information
-#define DEVICE_NAME "double-seed-incubator"
-#define CURRENT_FIRMWARE_VERSION "3.0.0"
-
 // Firebase Definitions
 // FirebaseData fbdo;
 // FirebaseAuth auth;
@@ -126,6 +122,7 @@ void sensorSetup()
   sensor2.begin();
 }
 
+/*
 void firmwareDownload(FCS_DownloadStatusInfo info)
 {
   if (info.status == fb_esp_fcs_download_status_init)
@@ -147,7 +144,7 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
     Serial.printf("New firmware update not available or download failed, %s\n", info.errorMsg.c_str());
   }
 }
-
+*/
 // void firebaseSetup()
 // {
 //   config.api_key = API_KEY;
@@ -435,7 +432,7 @@ void setup()
   digitalWrite(VEN2, HIGH);
   digitalWrite(HEL2, HIGH);
 
-  Serial.printf("Firmware v%s\r\n", CURRENT_FIRMWARE_VERSION);
+  Serial.printf("Firmware v%s\r\n", FIRMWARE_VERSION);
 
   sensorSetup();
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
@@ -491,7 +488,7 @@ void loop()
     {
       subRoutine1Online();
       // if there is a new update, download it
-      if (checkForUpdate(DEVICE_NAME, CURRENT_FIRMWARE_VERSION))
+      if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
       {
         downloadAndUpdateFirmware();
       }

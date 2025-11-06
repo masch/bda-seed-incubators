@@ -1,10 +1,18 @@
 #ifndef _BDA_ENV_H
 #define _BDA_ENV_H
 
+// Firmware configuration
+const char *DEVICE_NAME = DEVICE_NAME_MACRO;
+const char *FIRMWARE_VERSION = FIRMWARE_VERSION_MACRO;
+
+// BDA server configuration
 const char *BDA_API_URL = BDA_API_URL_MACRO;
+
+// WIFI connection configuration
 const char *WIFI_SSID = WIFI_SSID_MACRO;
 const char *WIFI_PASSWORD = WIFI_PASSWORD_MACRO;
 
+// Firebase configuration
 const char *FIREBASE_API_KEY = FIREBASE_API_KEY_MACRO;
 const char *FIREBASE_USER_EMAIL = FIREBASE_USER_EMAIL_MACRO;
 const char *FIREBASE_RTDB_URL = FIREBASE_RTDB_URL_MACRO;

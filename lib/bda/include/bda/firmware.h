@@ -24,7 +24,7 @@ void firebaseSetup()
 
     // Initialize Firebase
     Firebase.begin(&config, &auth);
-    Firebase.reconnectWiFi(true);
+    Firebase.reconnectNetwork(true);
 }
 
 bool checkForUpdate(const char *deviceId, const char *currentFirmwareVersion)
