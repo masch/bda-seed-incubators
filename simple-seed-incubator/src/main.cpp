@@ -22,6 +22,7 @@
 // Sensor definitions
 #define DHTTYPE DHT22
 DHT sensor(SEN, DHTTYPE);
+const char *SENOR_1_NAME = "S1";
 
 // WiFi Definitions
 const String bdaApiURL = BDA_API_URL;
@@ -163,7 +164,7 @@ void subRoutineInternet(void *params)
         vTaskDelay(5000);
         setTemp = getServerTemp(urls[1], setTemp);
         tempsUpdate(setTemp);
-        updateServerTemp(urls[2], temperature);
+        updateServerTemp(urls[2], SENOR_1_NAME, temperature);
         // if there is a new update, download it
         if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
         {
@@ -189,8 +190,11 @@ void setup()
 
   sensorSetup();
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
-  modeSetup(bdaApiURL);
-  firebaseSetup();
+  offlineMode = modeSetup(bdaApiURL);
+  if (!offlineMode)
+  {
+    firebaseSetup();
+  }
 
   xTaskCreatePinnedToCore(
       subRoutineInternet,
