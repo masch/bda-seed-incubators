@@ -14,12 +14,12 @@ bool wifiSetup(const char *ssid, const char *passWifi)
     WiFi.begin(ssid, passWifi);
     Serial.printf("Conectando a WiFi: %s ...\r\n", ssid);
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 5; i++)
     {
         if (WiFi.status() != WL_CONNECTED)
         {
             Serial.print('.');
-            vTaskDelay(1000);
+            delay(1000);
         }
         else
         {
@@ -46,7 +46,8 @@ bool modeSetup(String url)
 
     Serial.printf("\n\nVerificando conexion a Internet:... %s\r\n", url.c_str());
 
-    http.begin(url.c_str());
+    http.setTimeout(2000);
+    http.begin(url);
     int response = http.GET();
 
     if (response == 200)
@@ -77,7 +78,7 @@ float getServerTemp(String url, float setTemp)
 {
     float serverTemp = setTemp;
 
-    http.begin(url.c_str());
+    http.begin(url);
     int responseCode = http.GET();
     String responseTemp = http.getString();
 
@@ -100,7 +101,7 @@ void updateServerTempApp(String url, float newtemp)
     char buffer[6];
     String sentTemp = floatToString(newtemp, buffer, 6, 2);
 
-    http.begin(url.c_str());
+    http.begin(url);
     http.addHeader("temp", sentTemp);
     int responseCode = http.POST("");
 
@@ -129,6 +130,7 @@ void updateServerTempApp(String url, float newtemp)
 void sendToInfluxDB(const char *influxUrl, const char *influxOrg, const char *influxBucket, const char *influxToken, const char *deviceName, const char *sensorName, float temperature)
 {
     HTTPClient http;
+    http.setTimeout(2000);
 
     // Construct the InfluxDB API URL using .concat() to avoid ambiguity
     String url(influxUrl);
@@ -139,7 +141,7 @@ void sendToInfluxDB(const char *influxUrl, const char *influxOrg, const char *in
     url.concat("&precision=s");
 
     // Start the HTTP client
-    http.begin(url);
+    http.begin(url.c_str());
 
     // Construct the Authorization header using .concat()
     String authToken("Token ");

@@ -158,7 +158,6 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
 
 void readTemp1()
 {
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
   temp1 = sensor1.readTemperature();
   if (isnan(temp1))
   {
@@ -172,7 +171,6 @@ void readTemp1()
 
 void readTemp2()
 {
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
   temp2 = sensor2.readTemperature();
   if (isnan(temp2))
   {
@@ -393,7 +391,7 @@ void subRoutine1Online()
   setTemp2 = getServerTemp(getTemp2, setTemp2);
   tempsUpdate(setTemp1, setTemp2);
   readTemp1();
-  delay(500);
+  delay(2000);
   readTemp2();
   if (!isnan(temperature1))
   {
@@ -411,8 +409,8 @@ void subRoutine1Online()
 void subRoutine1Offline()
 {
   readTemp1();
-  delay(500);
-  readTemp1();
+  delay(2000);
+  readTemp2();
   controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
   controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
   delay(1000);
