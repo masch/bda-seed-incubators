@@ -159,9 +159,11 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
 void readTemp1()
 {
   temperature1 = NAN; // Start with an invalid value
-  for (int i = 0; i < 2; i++) { // Try reading 2 times
+  for (int i = 0; i < 2; i++)
+  { // Try reading 2 times
     temp1 = sensor1.readTemperature();
-    if (!isnan(temp1)) {
+    if (!isnan(temp1))
+    {
       temperature1 = temp1;
       Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
       return;
@@ -174,9 +176,11 @@ void readTemp1()
 void readTemp2()
 {
   temperature2 = NAN; // Start with an invalid value
-  for (int i = 0; i < 2; i++) { // Try reading 2 times
+  for (int i = 0; i < 2; i++)
+  { // Try reading 2 times
     temp2 = sensor2.readTemperature();
-    if (!isnan(temp2)) {
+    if (!isnan(temp2))
+    {
       temperature2 = temp2;
       Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
       return;
@@ -405,9 +409,9 @@ void subRoutine1Online()
   {
     updateServerTemp(updateTemp2, SENOR_2_NAME, temperature2);
   }
-  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
-  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
-  delay(1000);
+  // controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
+  // controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
+  // delay(1000);
 }
 
 void subRoutine1Offline()
