@@ -399,19 +399,19 @@ void subRoutine1Online()
   setTemp2 = getServerTemp(getTemp2, setTemp2);
   tempsUpdate(setTemp1, setTemp2);
   readTemp1();
-  delay(2000);
-  readTemp2();
-  // if (!isnan(temperature1))
-  // {
-  //   updateServerTemp(updateTemp1, SENOR_1_NAME, temperature1);
-  // }
-  // if (!isnan(temperature2))
-  // {
-  //   updateServerTemp(updateTemp2, SENOR_2_NAME, temperature2);
-  // }
-  // controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
-  // controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
-  // delay(1000);
+  // delay(2000);
+  // readTemp2();
+  //  if (!isnan(temperature1))
+  //  {
+  //    updateServerTemp(updateTemp1, SENOR_1_NAME, temperature1);
+  //  }
+  //  if (!isnan(temperature2))
+  //  {
+  //    updateServerTemp(updateTemp2, SENOR_2_NAME, temperature2);
+  //  }
+  //  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
+  //  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
+  //  delay(1000);
 }
 
 void subRoutine1Offline()
