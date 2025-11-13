@@ -165,7 +165,7 @@ void sendToInfluxDB(const char *influxUrl, const char *influxOrg, const char *in
     if (httpResponseCode > 0)
     {
         Serial.printf("InfluxDB response code: %d\n", httpResponseCode);
-        Serial.printf("InfluxDB response: %s\r\n", http.getString().c_str());
+        // Serial.printf("InfluxDB response: %s\r\n", http.getString().c_str());
     }
     else
     {
