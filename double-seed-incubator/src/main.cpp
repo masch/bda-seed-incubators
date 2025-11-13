@@ -158,28 +158,34 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
 
 void readTemp1()
 {
-  temp1 = sensor1.readTemperature();
-  if (isnan(temp1))
-  {
-    Serial.println("Error: Failed to read temperature from sensor 1");
-    temperature1 = NAN;
-    return;
+  temperature1 = NAN; // Start with an invalid value
+  for (int i = 0; i < 3; i++) { // Try reading 3 times
+    temp1 = sensor1.readTemperature();
+    if (!isnan(temp1)) {
+      temperature1 = temp1;
+      Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
+      return;
+    }
+    delay(500); // Wait before retrying
+    yield(); // Yield to other tasks
   }
-  temperature1 = temp1;
-  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
+  Serial.println("Error: Failed to read temperature from sensor 1");
 }
 
 void readTemp2()
 {
-  temp2 = sensor2.readTemperature();
-  if (isnan(temp2))
-  {
-    Serial.println("Error: Failed to read temperature from sensor 2");
-    temperature2 = NAN;
-    return;
+  temperature2 = NAN; // Start with an invalid value
+  for (int i = 0; i < 3; i++) { // Try reading 3 times
+    temp2 = sensor2.readTemperature();
+    if (!isnan(temp2)) {
+      temperature2 = temp2;
+      Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
+      return;
+    }
+    delay(500); // Wait before retrying
+    yield(); // Yield to other tasks
   }
-  temperature2 = temp2;
-  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
+  Serial.println("Error: Failed to read temperature from sensor 2");
 }
 
 void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow)
