@@ -27,10 +27,13 @@
 // Sensor definitions
 #define DHTTYPE DHT22
 DHT sensor1(S1, DHTTYPE);
+const char *SENOR_1_NAME = "S1";
 DHT sensor2(S2, DHTTYPE);
+const char *SENOR_2_NAME = "S2";
 
 // WiFi Definitions
 const String bdaApiURL = BDA_API_URL;
+String bdaStatusApiURL = bdaApiURL + "/status";
 String getTemp1 = bdaApiURL + "/v1/heladera-doble-1/gettemp";
 String updateTemp1 = bdaApiURL + "/v1/heladera-doble-1/updatetemp";
 String getTemp2 = bdaApiURL + "/v1/heladera-doble-2/gettemp";
@@ -158,7 +161,7 @@ void readTemp1()
   delay(1000);
   temp1 = sensor1.readTemperature();
   temperature1 = temp1;
-  Serial.printf("INFO - Temperatura detectada sensor: %f", temperature1);
+  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
 }
 
 void readTemp2()
@@ -166,7 +169,7 @@ void readTemp2()
   delay(1000);
   temp2 = sensor2.readTemperature();
   temperature2 = temp2;
-  Serial.printf("INFO - Temperatura detectada sensor: %f", temperature2);
+  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
 }
 
 void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow)
@@ -234,6 +237,8 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, fl
 
 void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow)
 {
+  Serial.println("ControlTemp2");
+
   if (isnan(tempNow))
   {
     Serial.println("Temperatura leida invalida Heladera 2");
@@ -378,8 +383,8 @@ void subRoutine1Online()
   readTemp1();
   delay(500);
   readTemp2();
-  updateServerTemp(updateTemp1, temperature1);
-  updateServerTemp(updateTemp2, temperature2);
+  updateServerTemp(updateTemp1, SENOR_1_NAME, temperature1);
+  updateServerTemp(updateTemp2, SENOR_2_NAME, temperature2);
   controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
   controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
   delay(1000);
@@ -436,8 +441,11 @@ void setup()
 
   sensorSetup();
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
-  modeSetup(bdaApiURL);
-  firebaseSetup();
+  offlineMode = modeSetup(bdaApiURL);
+  if (!offlineMode)
+  {
+    firebaseSetup();
+  }
 
   // Firebase.begin(&config, &auth);
   // config.fcs.download_buffer_size = 2048;
@@ -484,6 +492,7 @@ void loop()
 {
   while (error != true)
   {
+    offlineMode = modeSetup(bdaStatusApiURL);
     if (offlineMode == false)
     {
       subRoutine1Online();
