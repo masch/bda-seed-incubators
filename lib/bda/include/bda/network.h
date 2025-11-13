@@ -66,7 +66,7 @@ bool modeSetup(String url)
         {
             Serial.println("Modo de trabajo: OFFLINE: sin conexión");
         }
-        delay(5000);
+        delay(500);
         http.end();
         return true;
     }

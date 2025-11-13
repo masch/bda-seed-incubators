@@ -158,16 +158,28 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
 
 void readTemp1()
 {
-  delay(1000);
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
   temp1 = sensor1.readTemperature();
+  if (isnan(temp1))
+  {
+    Serial.println("Error: Failed to read temperature from sensor 1");
+    temperature1 = NAN;
+    return;
+  }
   temperature1 = temp1;
   Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
 }
 
 void readTemp2()
 {
-  delay(1000);
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
   temp2 = sensor2.readTemperature();
+  if (isnan(temp2))
+  {
+    Serial.println("Error: Failed to read temperature from sensor 2");
+    temperature2 = NAN;
+    return;
+  }
   temperature2 = temp2;
   Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
 }
