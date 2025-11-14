@@ -11,6 +11,9 @@ clean:
 
 rebuild: clean build
 
+reboot:
+	esptool --port /dev/ttyUSB0 --no-stub flash_id
+
 upload:
 	killall tio & pio run -t upload -e nodemcu-32s && tio /dev/ttyUSB0 -b 115200
 
@@ -18,3 +21,5 @@ kill-tio:
 	killall tio	
 
 kill-upload: kill-tio upload
+
+reboot-connect: kill-tio reboot connect-esp32
