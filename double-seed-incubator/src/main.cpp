@@ -514,21 +514,19 @@ void setup()
 
 void loop()
 {
-  while (error != true)
+  offlineMode = modeSetup(bdaStatusApiURL);
+  if (offlineMode == false)
   {
-    offlineMode = modeSetup(bdaStatusApiURL);
-    if (offlineMode == false)
+    subRoutine1Online();
+    // if there is a new update, download it
+    if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
     {
-      subRoutine1Online();
-      // if there is a new update, download it
-      if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
-      {
-        downloadAndUpdateFirmware();
-      }
-    }
-    else
-    {
-      subRoutine1Offline();
+      downloadAndUpdateFirmware();
     }
   }
+  else
+  {
+    subRoutine1Offline();
+  }
+  delay(1000);
 }

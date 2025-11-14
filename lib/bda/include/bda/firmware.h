@@ -16,6 +16,8 @@ String Firebase_Firmware_Update_URL = "";
 
 void firebaseSetup()
 {
+    Serial.print("Firebase: setup");
+
     // Configure Firebase
     config.api_key = FIREBASE_API_KEY;
     config.database_url = FIREBASE_RTDB_URL;
