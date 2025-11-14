@@ -158,38 +158,36 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
 
 void readTemp1()
 {
-  temperature1 = NAN; // Start with an invalid value
-  for (int i = 0; i < 2; i++)
-  { // Try reading 2 times
-    temp1 = sensor1.readTemperature();
-    if (!isnan(temp1))
-    {
-      temperature1 = temp1;
-      Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
-      return;
-    }
-    yield();
-    delay(250); // Wait before retrying
+  temperature1 = NAN; // Assume failure
+  temp1 = sensor1.readTemperature();
+
+  if (!isnan(temp1))
+  {
+    temperature1 = temp1;
+    Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
   }
-  Serial.println("Error: Failed to read temperature from sensor 1");
+  else
+  {
+    Serial.println("Error: Failed to read temperature from sensor 1");
+  }
+  yield(); // Yield to the scheduler to prevent watchdog issues.
 }
 
 void readTemp2()
 {
-  temperature2 = NAN; // Start with an invalid value
-  for (int i = 0; i < 2; i++)
-  { // Try reading 2 times
-    temp2 = sensor2.readTemperature();
-    if (!isnan(temp2))
-    {
-      temperature2 = temp2;
-      Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
-      return;
-    }
-    yield();
-    delay(250); // Wait before retrying
+  temperature2 = NAN; // Assume failure
+  temp2 = sensor2.readTemperature();
+
+  if (!isnan(temp2))
+  {
+    temperature2 = temp2;
+    Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
   }
-  Serial.println("Error: Failed to read temperature from sensor 2");
+  else
+  {
+    Serial.println("Error: Failed to read temperature from sensor 2");
+  }
+  yield(); // Yield to the scheduler to prevent watchdog issues.
 }
 
 void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow)
