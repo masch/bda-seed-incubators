@@ -22,4 +22,4 @@ kill-tio:
 
 kill-upload: kill-tio upload
 
-reboot-connect: reboot connect-esp32
+reboot-connect: kill-tio reboot connect-esp32

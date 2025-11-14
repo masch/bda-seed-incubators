@@ -158,6 +158,7 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
 
 void readTemp1()
 {
+  vTaskDelay(10 / portTICK_PERIOD_MS); // Small delay to allow system tasks to run
   temperature1 = NAN; // Assume failure
   temp1 = sensor1.readTemperature();
 
@@ -175,6 +176,7 @@ void readTemp1()
 
 void readTemp2()
 {
+  vTaskDelay(10 / portTICK_PERIOD_MS); // Small delay to allow system tasks to run
   temperature2 = NAN; // Assume failure
   temp2 = sensor2.readTemperature();
 
@@ -528,5 +530,5 @@ void loop()
   {
     subRoutine1Offline();
   }
-  delay(1000);
+  delay(2000);
 }
