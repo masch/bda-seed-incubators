@@ -12,7 +12,7 @@ clean:
 rebuild: clean build
 
 reboot:
-	esptool.py --port /dev/ttyUSB0 --no-stub flash_id
+	esptool --port /dev/ttyUSB0 --no-stub flash_id
 
 upload:
 	killall tio & pio run -t upload -e nodemcu-32s && tio /dev/ttyUSB0 -b 115200
