@@ -1,9 +1,10 @@
 #ifndef _BDA_FIRMWARE_H
 #define _BDA_FIRMWARE_H
 
-#include <bda/env.h>
-#include <HTTPClient.h>
+#include "addons/TokenHelper.h"
 #include <Firebase_ESP_Client.h>
+#include <HTTPClient.h>
+#include <bda/env.h>
 
 // Firebase instance
 FirebaseData fbdo;
@@ -14,121 +15,133 @@ FirebaseConfig config;
 String Update_Version = "";
 String Firebase_Firmware_Update_URL = "";
 
-void firebaseSetup()
-{
-    Serial.print("Firebase: setup");
+void firebaseSetup() {
+  Serial.println("Firebase: setup start");
 
-    // Configure Firebase
-    config.api_key = FIREBASE_API_KEY;
-    config.database_url = FIREBASE_RTDB_URL;
-    auth.user.email = FIREBASE_USER_EMAIL;
-    auth.user.password = FIREBASE_USER_PASSWORD;
+  // Configure Firebase
+  config.api_key = FIREBASE_API_KEY;
+  config.database_url = FIREBASE_RTDB_URL;
+  auth.user.email = FIREBASE_USER_EMAIL;
+  auth.user.password = FIREBASE_USER_PASSWORD;
 
-    // Initialize Firebase
-    Firebase.begin(&config, &auth);
-    Firebase.reconnectNetwork(true);
+  // Set timeouts (in ms)
+  config.timeout.socketConnection = 10000;
+  config.timeout.serverResponse = 10000;
+  config.timeout.wifiReconnect = 10000;
+
+  // Assign the callback function for the long running token generation task
+  config.token_status_callback = tokenStatusCallback;
+
+  // Initialize Firebase
+  Serial.println("Firebase: calling begin...");
+  Firebase.begin(&config, &auth);
+  Serial.println("Firebase: begin returned");
+
+  Firebase.reconnectNetwork(true);
+  Serial.println("Firebase: setup complete");
 }
 
 bool checkForUpdate(const char *deviceId, const char *currentFirmwareVersion) {
-    if (!Firebase.ready()) {
-        Serial.println("Firebase: not ready");
-        return false;
-    }
-
-    // Read Available update Version Number for the device
-    String devicePath = String("/devices/");
-    devicePath.concat(deviceId);
-    devicePath.concat("/update/");
-
-    String deviceVersionPath = devicePath;
-    deviceVersionPath.concat("version");
-    if (Firebase.RTDB.getString(&fbdo, deviceVersionPath)) {
-        Update_Version = fbdo.stringData();
-        Serial.printf(" ********************Current version: %s********************\r\n", currentFirmwareVersion);
-        Serial.printf(" ********************Latest version: %s********************\r\n", Update_Version.c_str());
-
-        char update_version = Update_Version.compareTo(currentFirmwareVersion);
-
-        // if version doesn't match update with cloud version
-        if (update_version != 0) {
-            Serial.printf("********************New version available: %s ********************\r\n", Update_Version.c_str());
-            // Read update URL
-            String deviceURLPath = devicePath;
-            deviceURLPath.concat("url");
-            if (Firebase.RTDB.getString(&fbdo, deviceURLPath)) {
-                Firebase_Firmware_Update_URL = fbdo.stringData();
-                Serial.println(Firebase_Firmware_Update_URL);
-                return true;
-            }
-            else {
-                Serial.printf("********************Firebase.RTDB error %s ********************\r\n", fbdo.errorReason().c_str());
-            }
-        }
-        else {
-            Serial.println("********************Application is Up To Date********************");
-        }
-    }
-    else {
-        Serial.printf("********************Firebase.RTDB error %s ********************\r\n", fbdo.errorReason().c_str());
-    }
-
+  if (!Firebase.ready()) {
+    Serial.println("Firebase: not ready");
     return false;
+  }
+
+  // Read Available update Version Number for the device
+  String devicePath = String("/devices/");
+  devicePath.concat(deviceId);
+  devicePath.concat("/update/");
+
+  String deviceVersionPath = devicePath;
+  deviceVersionPath.concat("version");
+  if (Firebase.RTDB.getString(&fbdo, deviceVersionPath)) {
+    Update_Version = fbdo.stringData();
+    Serial.printf(
+        " ********************Current version: %s********************\r\n",
+        currentFirmwareVersion);
+    Serial.printf(
+        " ********************Latest version: %s********************\r\n",
+        Update_Version.c_str());
+
+    char update_version = Update_Version.compareTo(currentFirmwareVersion);
+
+    // if version doesn't match update with cloud version
+    if (update_version != 0) {
+      Serial.printf("********************New version available: %s "
+                    "********************\r\n",
+                    Update_Version.c_str());
+      // Read update URL
+      String deviceURLPath = devicePath;
+      deviceURLPath.concat("url");
+      if (Firebase.RTDB.getString(&fbdo, deviceURLPath)) {
+        Firebase_Firmware_Update_URL = fbdo.stringData();
+        Serial.println(Firebase_Firmware_Update_URL);
+        return true;
+      } else {
+        Serial.printf("********************Firebase.RTDB error %s "
+                      "********************\r\n",
+                      fbdo.errorReason().c_str());
+      }
+    } else {
+      Serial.println(
+          "********************Application is Up To Date********************");
+    }
+  } else {
+    Serial.printf(
+        "********************Firebase.RTDB error %s ********************\r\n",
+        fbdo.errorReason().c_str());
+  }
+
+  return false;
 }
 
-void downloadAndUpdateFirmware()
-{
-    // Get the download URL from Firebase
-    Serial.print("Firmware URL: ");
-    Serial.println(Firebase_Firmware_Update_URL);
+void downloadAndUpdateFirmware() {
+  // Get the download URL from Firebase
+  Serial.print("Firmware URL: ");
+  Serial.println(Firebase_Firmware_Update_URL);
 
-    HTTPClient http;
-    http.begin(Firebase_Firmware_Update_URL);
+  HTTPClient http;
+  http.begin(Firebase_Firmware_Update_URL);
 
-    int httpCode = http.GET();
+  int httpCode = http.GET();
 
-    if (httpCode == HTTP_CODE_OK)
-    {
-        WiFiClient &client = http.getStream();
-        int firmwareSize = http.getSize();
-        Serial.print("Firmware Size: ");
-        Serial.println(firmwareSize);
+  if (httpCode == HTTP_CODE_OK) {
+    WiFiClient &client = http.getStream();
+    int firmwareSize = http.getSize();
+    Serial.print("Firmware Size: ");
+    Serial.println(firmwareSize);
 
-        if (Update.begin(firmwareSize))
-        {
-            size_t written = Update.writeStream(client); //////////// Takes Time
+    if (Update.begin(firmwareSize)) {
+      size_t written = Update.writeStream(client); //////////// Takes Time
 
-            if (Update.size() == written)
-            {
-                Serial.println("********************Update successfully completed. Rebooting...********************");
+      if (Update.size() == written) {
+        Serial.println("********************Update successfully completed. "
+                       "Rebooting...********************");
 
-                if (Update.end())
-                {
-                    Serial.println("********************Rebooting...********************");
-                    ESP.restart();
-                }
-                else
-                {
-                    Serial.print("********************Update failed: ********************");
-                    Serial.println(Update.errorString());
-                }
-            }
-            else
-            {
-                Serial.println("********************Not enough space for OTA.********************");
-            }
+        if (Update.end()) {
+          Serial.println(
+              "********************Rebooting...********************");
+          ESP.restart();
+        } else {
+          Serial.print(
+              "********************Update failed: ********************");
+          Serial.println(Update.errorString());
         }
-        else
-        {
-            Serial.println("********************Failed to begin OTA update.********************");
-        }
+      } else {
+        Serial.println("********************Not enough space for "
+                       "OTA.********************");
+      }
+    } else {
+      Serial.println("********************Failed to begin OTA "
+                     "update.********************");
     }
-    else
-    {
-        Serial.print("********************Failed to download firmware. HTTP code: ********************");
-        Serial.println(httpCode);
-    }
+  } else {
+    Serial.print("********************Failed to download firmware. HTTP code: "
+                 "********************");
+    Serial.println(httpCode);
+  }
 
-    http.end();
+  http.end();
 }
 
 #endif // _BDA_NETWORK_H
