@@ -189,4 +189,10 @@ void updateServerTemp(String url, const char *sensorName, float newtemp)
     updateServerTemp(DEVICE_NAME, sensorName, newtemp);
 }
 
+// Send alive signal to the server
+void updateServerAlive()
+{
+    updateServerTemp(DEVICE_NAME, "alive", 1);
+}
+
 #endif // _BDA_NETWORK_H

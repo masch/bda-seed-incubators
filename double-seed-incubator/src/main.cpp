@@ -495,6 +495,7 @@ void setup() {
 
 void loop() {
   offlineMode = modeSetup(bdaStatusApiURL);
+  updateServerAlive();
   if (offlineMode == false) {
     subRoutine1Online();
     // if there is a new update, download it
