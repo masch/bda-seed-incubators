@@ -437,7 +437,7 @@ void setup() {
 
   sensorSetup();
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
-  offlineMode = modeSetup(bdaApiURL);
+  offlineMode = modeSetup(bdaStatusApiURL);
   if (!offlineMode) {
     firebaseSetup();
   }
