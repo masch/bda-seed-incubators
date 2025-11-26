@@ -162,6 +162,7 @@ void readTemp1() {
 
   if (isnan(temp1)) {
     Serial.println("Error: Failed to read temperature from sensor 1");
+    temperature1 = NAN;
     return;
   }
 
@@ -173,8 +174,9 @@ void readTemp2() {
   delay(1000);
   temp2 = sensor2.readTemperature();
 
-  if (!isnan(temp2)) {
+  if (isnan(temp2)) {
     Serial.println("Error: Failed to read temperature from sensor 2");
+    temperature2 = NAN;
     return;
   }
   temperature2 = temp2;
@@ -185,6 +187,11 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
                   float tempNow) {
   if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 1");
+    digitalWrite(REL1, HIGH);
+    digitalWrite(VEN1, HIGH);
+    digitalWrite(HEL1, HIGH);
+    heladeraOn1 = false;
+    lampOn1 = false;
   } else {
     Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 1: %f\r\n",
                   setTemp1);
@@ -237,6 +244,11 @@ void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp,
 
   if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 2");
+    digitalWrite(REL2, HIGH);
+    digitalWrite(VEN2, HIGH);
+    digitalWrite(HEL2, HIGH);
+    heladeraOn2 = false;
+    lampOn2 = false;
   } else {
     Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 2: %f\r\n",
                   setTemp2);
