@@ -186,7 +186,7 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
   if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 1");
   } else {
-    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 1: %f",
+    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 1: %f\r\n",
                   setTemp1);
     if (tempNow >= minHela) {
       if (tempNow >= maxHela) {
@@ -238,7 +238,7 @@ void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp,
   if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 2");
   } else {
-    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 2: %f",
+    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 2: %f\r\n",
                   setTemp2);
     if (tempNow >= minHela) {
       if (tempNow >= maxHela) {

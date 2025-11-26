@@ -164,12 +164,12 @@ void sendToInfluxDB(const char *influxUrl, const char *influxOrg, const char *in
     // Check the response
     if (httpResponseCode > 0)
     {
-        Serial.printf("InfluxDB response code: %d\n", httpResponseCode);
+        Serial.printf("InfluxDB response code: %d\r\n", httpResponseCode);
         // Serial.printf("InfluxDB response: %s\r\n", http.getString().c_str());
     }
     else
     {
-        Serial.printf("Error sending to InfluxDB. HTTP error: %s\n", http.errorToString(httpResponseCode).c_str());
+        Serial.printf("Error sending to InfluxDB. HTTP error: %s\r\n", http.errorToString(httpResponseCode).c_str());
     }
 
     // End the connection
