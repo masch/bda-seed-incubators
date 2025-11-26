@@ -438,6 +438,18 @@ void setup() {
   sensorSetup();
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
   offlineMode = modeSetup(bdaStatusApiURL);
+  timeClient.begin();
+  timeClient.setTimeOffset(-10800);
+
+  Serial.print("Syncing time");
+  while (!timeClient.update()) {
+    timeClient.forceUpdate();
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println();
+  Serial.println(timeClient.getFormattedTime());
+
   if (!offlineMode) {
     firebaseSetup();
   }
@@ -445,9 +457,6 @@ void setup() {
   // Firebase.begin(&config, &auth);
   // config.fcs.download_buffer_size = 2048;
   // Firebase.reconnectWiFi(true);
-
-  // timeClient.begin();
-  // timeClient.setTimeOffset(-10800);
 
   // if (Firebase.ready() && !taskCompleted)
   // {
