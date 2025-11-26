@@ -29,52 +29,47 @@ void firebaseSetup()
     Firebase.reconnectNetwork(true);
 }
 
-bool checkForUpdate(const char *deviceId, const char *currentFirmwareVersion)
-{
-    if (Firebase.ready())
-    {
-        // Read Available update Version Number for the device
-        String devicePath = String("/devices/");
-        devicePath.concat(deviceId);
-        devicePath.concat("/update/");
+bool checkForUpdate(const char *deviceId, const char *currentFirmwareVersion) {
+    if (!Firebase.ready()) {
+        Serial.println("Firebase: not ready");
+        return false;
+    }
 
-        String deviceVersionPath = devicePath;
-        deviceVersionPath.concat("version");
-        if (Firebase.RTDB.getString(&fbdo, deviceVersionPath))
-        {
-            Update_Version = fbdo.stringData();
-            Serial.printf(" ********************Current version: %s********************\r\n", currentFirmwareVersion);
-            Serial.printf(" ********************Latest version: %s********************\r\n", Update_Version.c_str());
+    // Read Available update Version Number for the device
+    String devicePath = String("/devices/");
+    devicePath.concat(deviceId);
+    devicePath.concat("/update/");
 
-            char update_version = Update_Version.compareTo(currentFirmwareVersion);
+    String deviceVersionPath = devicePath;
+    deviceVersionPath.concat("version");
+    if (Firebase.RTDB.getString(&fbdo, deviceVersionPath)) {
+        Update_Version = fbdo.stringData();
+        Serial.printf(" ********************Current version: %s********************\r\n", currentFirmwareVersion);
+        Serial.printf(" ********************Latest version: %s********************\r\n", Update_Version.c_str());
 
-            // if version doesn't match update with cloud version
-            if (update_version != 0)
-            {
-                Serial.printf("********************New version available: %s ********************\r\n", Update_Version.c_str());
-                // Read update URL
-                String deviceURLPath = devicePath;
-                deviceURLPath.concat("url");
-                if (Firebase.RTDB.getString(&fbdo, deviceURLPath))
-                {
-                    Firebase_Firmware_Update_URL = fbdo.stringData();
-                    Serial.println(Firebase_Firmware_Update_URL);
-                    return true;
-                }
-                else
-                {
-                    Serial.printf("********************Firebase.RTDB error %s ********************\r\n", fbdo.errorReason().c_str());
-                }
+        char update_version = Update_Version.compareTo(currentFirmwareVersion);
+
+        // if version doesn't match update with cloud version
+        if (update_version != 0) {
+            Serial.printf("********************New version available: %s ********************\r\n", Update_Version.c_str());
+            // Read update URL
+            String deviceURLPath = devicePath;
+            deviceURLPath.concat("url");
+            if (Firebase.RTDB.getString(&fbdo, deviceURLPath)) {
+                Firebase_Firmware_Update_URL = fbdo.stringData();
+                Serial.println(Firebase_Firmware_Update_URL);
+                return true;
             }
-            else
-            {
-                Serial.println("********************Application is Up To Date********************");
+            else {
+                Serial.printf("********************Firebase.RTDB error %s ********************\r\n", fbdo.errorReason().c_str());
             }
         }
-        else
-        {
-            Serial.printf("********************Firebase.RTDB error %s ********************\r\n", fbdo.errorReason().c_str());
+        else {
+            Serial.println("********************Application is Up To Date********************");
         }
+    }
+    else {
+        Serial.printf("********************Firebase.RTDB error %s ********************\r\n", fbdo.errorReason().c_str());
     }
 
     return false;
