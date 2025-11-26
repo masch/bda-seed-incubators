@@ -1,18 +1,18 @@
 #include <Arduino.h>
-#include <stdlib.h>
 #include <DHT.h>
-#include <math.h>
 #include <bda/env.h>
 #include <bda/firmware.h>
 #include <bda/network.h>
+#include <math.h>
+#include <stdlib.h>
 
-#include <WiFi.h>
-#include <NTPClient.h>
-#include <HTTPClient.h>
-#include <Update.h>
-#include <Firebase_ESP_Client.h>
-#include <floatToString.h>
 #include "addons/TokenHelper.h"
+#include <Firebase_ESP_Client.h>
+#include <HTTPClient.h>
+#include <NTPClient.h>
+#include <Update.h>
+#include <WiFi.h>
+#include <floatToString.h>
 
 // Pin definitons
 #define S1 18
@@ -78,8 +78,7 @@ float maxTempLamp2 = setTemp2 - 0.5;
 float temperature1, temperature2;
 float temp1, temp2;
 
-class Log
-{
+class Log {
 public:
   double temperatureLog;
   String timestampLog;
@@ -119,8 +118,7 @@ Log TempLog2;
   Serial.println(WiFi.localIP());
 }*/
 
-void sensorSetup()
-{
+void sensorSetup() {
   sensor1.begin();
   sensor2.begin();
 }
@@ -131,7 +129,8 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
   if (info.status == fb_esp_fcs_download_status_init)
   {
     Serial.printf("New update found\n");
-    Serial.printf("Downloading firmware %s (%d bytes)\n", info.remoteFileName.c_str(), info.fileSize);
+    Serial.printf("Downloading firmware %s (%d bytes)\n",
+info.remoteFileName.c_str(), info.fileSize);
   }
   else if (info.status == fb_esp_fcs_download_status_download)
   {
@@ -144,7 +143,8 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
   }
   else if (info.status == fb_esp_fcs_download_status_error)
   {
-    Serial.printf("New firmware update not available or download failed, %s\n", info.errorMsg.c_str());
+    Serial.printf("New firmware update not available or download failed, %s\n",
+info.errorMsg.c_str());
   }
 }
 */
@@ -156,65 +156,47 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
 //   config.token_status_callback = tokenStatusCallback;
 // }
 
-void readTemp1()
-{
-  vTaskDelay(10 / portTICK_PERIOD_MS); // Small delay to allow system tasks to run
-  temperature1 = NAN; // Assume failure
+void readTemp1() {
+  delay(1000);
   temp1 = sensor1.readTemperature();
 
-  if (!isnan(temp1))
-  {
-    temperature1 = temp1;
-    Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
-  }
-  else
-  {
+  if (isnan(temp1)) {
     Serial.println("Error: Failed to read temperature from sensor 1");
+    return;
   }
-  yield(); // Yield to the scheduler to prevent watchdog issues.
+
+  temperature1 = temp1;
+  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
 }
 
-void readTemp2()
-{
-  vTaskDelay(10 / portTICK_PERIOD_MS); // Small delay to allow system tasks to run
-  temperature2 = NAN; // Assume failure
+void readTemp2() {
+  delay(1000);
   temp2 = sensor2.readTemperature();
 
-  if (!isnan(temp2))
-  {
-    temperature2 = temp2;
-    Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
-  }
-  else
-  {
+  if (!isnan(temp2)) {
     Serial.println("Error: Failed to read temperature from sensor 2");
+    return;
   }
-  yield(); // Yield to the scheduler to prevent watchdog issues.
+  temperature2 = temp2;
+  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
 }
 
-void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow)
-{
-  if (isnan(tempNow))
-  {
+void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
+                  float tempNow) {
+  if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 1");
-  }
-  else
-  {
-    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 1: %f", setTemp1);
-    if (tempNow >= minHela)
-    {
-      if (tempNow >= maxHela)
-      {
+  } else {
+    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 1: %f",
+                  setTemp1);
+    if (tempNow >= minHela) {
+      if (tempNow >= maxHela) {
         digitalWrite(HEL1, LOW);
         digitalWrite(VEN1, LOW);
         digitalWrite(REL1, HIGH);
         heladeraOn1 = true;
         Serial.println("Entra en Modo encender heladera - Heladera 1");
-      }
-      else
-      {
-        if (tempNow <= minHela && heladeraOn1)
-        {
+      } else {
+        if (tempNow <= minHela && heladeraOn1) {
           digitalWrite(HEL1, HIGH);
           digitalWrite(VEN1, HIGH);
           heladeraOn1 = false;
@@ -223,20 +205,15 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, fl
       }
     }
 
-    else if (tempNow <= minLamp)
-    {
-      if (tempNow <= maxLamp)
-      {
+    else if (tempNow <= minLamp) {
+      if (tempNow <= maxLamp) {
         digitalWrite(REL1, LOW);
         digitalWrite(VEN1, LOW);
         digitalWrite(HEL1, HIGH);
         lampOn1 = true;
         Serial.println("Entra en Modo encender lampara - Heladera 1");
-      }
-      else
-      {
-        if (tempNow >= minLamp && lampOn1)
-        {
+      } else {
+        if (tempNow >= minLamp && lampOn1) {
           digitalWrite(REL1, HIGH);
           digitalWrite(VEN1, HIGH);
           lampOn1 = false;
@@ -245,8 +222,7 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, fl
       }
     }
 
-    else if (!lampOn1 || !heladeraOn1)
-    {
+    else if (!lampOn1 || !heladeraOn1) {
       digitalWrite(REL1, HIGH);
       digitalWrite(VEN1, HIGH);
       digitalWrite(HEL1, HIGH);
@@ -255,31 +231,24 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, fl
   }
 }
 
-void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow)
-{
+void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp,
+                  float tempNow) {
   Serial.println("ControlTemp2");
 
-  if (isnan(tempNow))
-  {
+  if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 2");
-  }
-  else
-  {
-    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 2: %f", setTemp2);
-    if (tempNow >= minHela)
-    {
-      if (tempNow >= maxHela)
-      {
+  } else {
+    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 2: %f",
+                  setTemp2);
+    if (tempNow >= minHela) {
+      if (tempNow >= maxHela) {
         digitalWrite(HEL2, LOW);
         digitalWrite(VEN2, LOW);
         digitalWrite(REL2, HIGH);
         heladeraOn2 = true;
         Serial.println("Entra en Modo encender heladera - Heladera 2");
-      }
-      else
-      {
-        if (tempNow <= minHela && heladeraOn2)
-        {
+      } else {
+        if (tempNow <= minHela && heladeraOn2) {
           digitalWrite(HEL2, HIGH);
           digitalWrite(VEN2, HIGH);
           heladeraOn2 = false;
@@ -288,20 +257,15 @@ void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp, fl
       }
     }
 
-    else if (tempNow <= minLamp)
-    {
-      if (tempNow <= maxLamp)
-      {
+    else if (tempNow <= minLamp) {
+      if (tempNow <= maxLamp) {
         digitalWrite(REL2, LOW);
         digitalWrite(VEN2, LOW);
         digitalWrite(HEL2, HIGH);
         lampOn2 = true;
         Serial.println("Entra en Modo encender lampara - Heladera 2");
-      }
-      else
-      {
-        if (tempNow >= minLamp && lampOn2)
-        {
+      } else {
+        if (tempNow >= minLamp && lampOn2) {
           digitalWrite(REL2, HIGH);
           digitalWrite(VEN2, HIGH);
           lampOn2 = false;
@@ -310,8 +274,7 @@ void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp, fl
       }
     }
 
-    else if (!lampOn2 || !heladeraOn2)
-    {
+    else if (!lampOn2 || !heladeraOn2) {
       digitalWrite(REL2, HIGH);
       digitalWrite(VEN2, HIGH);
       digitalWrite(HEL2, HIGH);
@@ -382,8 +345,7 @@ void modeSetup(String url)
 }
 */
 
-void tempsUpdate(float tempNow1, float tempNow2)
-{
+void tempsUpdate(float tempNow1, float tempNow2) {
   minTempHela1 = tempNow1 + 0.2;
   maxTempHela1 = tempNow1 + 0.5;
   minTempLamp1 = tempNow1 - 0.2;
@@ -395,43 +357,40 @@ void tempsUpdate(float tempNow1, float tempNow2)
   maxTempLamp2 = tempNow2 - 0.5;
 }
 
-void subRoutine1Online()
-{
+void subRoutine1Online() {
   setTemp1 = getServerTemp(getTemp1, setTemp1);
   setTemp2 = getServerTemp(getTemp2, setTemp2);
   tempsUpdate(setTemp1, setTemp2);
   readTemp1();
-  // delay(2000);
-  // readTemp2();
-  //  if (!isnan(temperature1))
-  //  {
-  //    updateServerTemp(updateTemp1, SENOR_1_NAME, temperature1);
-  //  }
-  //  if (!isnan(temperature2))
-  //  {
-  //    updateServerTemp(updateTemp2, SENOR_2_NAME, temperature2);
-  //  }
-  //  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
-  //  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
-  //  delay(1000);
-}
-
-void subRoutine1Offline()
-{
-  readTemp1();
-  delay(2000);
+  delay(500);
   readTemp2();
-  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
-  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
+  if (!isnan(temperature1)) {
+    updateServerTemp(updateTemp1, SENOR_1_NAME, temperature1);
+  }
+  if (!isnan(temperature2)) {
+    updateServerTemp(updateTemp2, SENOR_2_NAME, temperature2);
+  }
+  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1,
+               temperature1);
+  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2,
+               temperature2);
   delay(1000);
 }
 
-void subRoutine2(void *pvParameters)
-{
-  while (1)
-  {
-    while (!timeClient.update())
-    {
+void subRoutine1Offline() {
+  readTemp1();
+  delay(500);
+  readTemp1();
+  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1,
+               temperature1);
+  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2,
+               temperature2);
+  delay(1000);
+}
+
+void subRoutine2(void *pvParameters) {
+  while (1) {
+    while (!timeClient.update()) {
       timeClient.forceUpdate();
     }
     formattedDate = timeClient.getFormattedTime();
@@ -445,8 +404,7 @@ void subRoutine2(void *pvParameters)
   }
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
 
   pinMode(REL1, OUTPUT);
@@ -468,8 +426,7 @@ void setup()
   sensorSetup();
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
   offlineMode = modeSetup(bdaApiURL);
-  if (!offlineMode)
-  {
+  if (!offlineMode) {
     firebaseSetup();
   }
 
@@ -494,7 +451,8 @@ void setup()
   //   }
   //   else
   //   {
-  //     Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo, STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
+  //     Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo,
+  //     STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
   //     Serial.println("Restarting...\n\n");
   //     delay(2000);
   //     ESP.restart();
@@ -514,20 +472,15 @@ void setup()
   }*/
 }
 
-void loop()
-{
+void loop() {
   offlineMode = modeSetup(bdaStatusApiURL);
-  if (offlineMode == false)
-  {
+  if (offlineMode == false) {
     subRoutine1Online();
     // if there is a new update, download it
-    if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
-    {
+    if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION)) {
       downloadAndUpdateFirmware();
     }
-  }
-  else
-  {
+  } else {
     subRoutine1Offline();
   }
   delay(2000);
