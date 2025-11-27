@@ -112,7 +112,7 @@ void updateServerTempApp(String url, float newtemp) {
 void sendToInfluxDB(const char *influxUrl, const char *influxOrg,
                     const char *influxBucket, const char *influxToken,
                     const char *deviceName, const char *sensorName,
-                    float temperature) {
+                    const char *measureName, float measureValue) {
   HTTPClient http;
 
   // Construct the InfluxDB API URL using .concat() to avoid ambiguity
@@ -133,13 +133,15 @@ void sendToInfluxDB(const char *influxUrl, const char *influxOrg,
   http.addHeader("Content-Type", "text/plain; charset=utf-8");
 
   // Prepare the data in InfluxDB's Line Protocol format using .concat()
-  String postData("temperature,device=");
+
+  String postData(measureName);
+  postData.concat(",device=");
   postData.concat(deviceName);
   postData.concat(",location=lab-bda-umepay");
   postData.concat(",sensor=");
   postData.concat(sensorName);
   postData.concat(" value=");
-  postData.concat(String(temperature)); // Convert float to String
+  postData.concat(String(measureValue)); // Convert float to String
 
   Serial.printf("Sending data to InfluxDB: %s - %s\r\n", url.c_str(),
                 postData.c_str());
@@ -163,8 +165,10 @@ void sendToInfluxDB(const char *influxUrl, const char *influxOrg,
 // Send current temperatura to the server
 void updateServerTemp(const char *deviceName, const char *sensorName,
                       float temperature) {
+  const char *temperatureMeasureName = "temperature";
+
   sendToInfluxDB(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN,
-                 deviceName, sensorName, temperature);
+                 deviceName, sensorName, temperatureMeasureName, temperature);
 }
 
 // Send current temperatura to the server
@@ -174,6 +178,11 @@ void updateServerTemp(String url, const char *sensorName, float newtemp) {
 }
 
 // Send alive signal to the server
-void updateServerAlive() { updateServerTemp(DEVICE_NAME, "alive", 1); }
+void updateServerAlive() {
+  const char *aliveSensorName = "ping";
+  const char *aliveMeasureName = "alive";
+  sendToInfluxDB(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN,
+                 DEVICE_NAME, aliveSensorName, aliveMeasureName, true);
+}
 
 #endif // _BDA_NETWORK_H
