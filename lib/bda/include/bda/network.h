@@ -72,8 +72,8 @@ float getServerTemp(String url, float setTemp) {
   } else {
     Serial.printf("getServerTemp-Error: %i \r\n", responseCode);
   }
-  Serial.print("CONTROL - Temperatura leida del Servidor: ");
-  Serial.println(serverTemp);
+  Serial.printf("CONTROL - Temperatura leida del Servidor: %f \r\n",
+                serverTemp);
   http.end();
   return serverTemp;
 }
@@ -88,7 +88,8 @@ void updateServerTempApp(String url, float newtemp) {
   int responseCode = http.POST("");
 
   if (responseCode == 200) {
-    Serial.println("Temperatura enviada correctamente a servidor");
+    Serial.printf("Temperatura enviada correctamente a servidor: %f \r\n",
+                  newtemp);
   } else {
     Serial.printf("updateServerTemp-Error: %i \r\n", responseCode);
   }
