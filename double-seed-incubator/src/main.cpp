@@ -167,7 +167,8 @@ void readTemp1() {
   }
 
   temperature1 = temp1;
-  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature1);
+  Serial.print("INFO - Temperatura detectada sensor: ");
+  Serial.println(temperature1);
 }
 
 void readTemp2() {
@@ -180,7 +181,8 @@ void readTemp2() {
     return;
   }
   temperature2 = temp2;
-  Serial.printf("INFO - Temperatura detectada sensor: %f\r\n", temperature2);
+  Serial.print("INFO - Temperatura detectada sensor: ");
+  Serial.println(temperature2);
 }
 
 void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
@@ -193,8 +195,8 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
     heladeraOn1 = false;
     lampOn1 = false;
   } else {
-    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 1: %f\r\n",
-                  setTemp1);
+    Serial.print("CONTROL - Temperatura de trabajo Heladera Doble 1: ");
+    Serial.println(setTemp1);
     if (tempNow >= minHela) {
       if (tempNow >= maxHela) {
         digitalWrite(HEL1, LOW);
@@ -250,8 +252,8 @@ void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp,
     heladeraOn2 = false;
     lampOn2 = false;
   } else {
-    Serial.printf("CONTROL - Temperatura de trabajo Heladera Doble 2: %f\r\n",
-                  setTemp2);
+    Serial.print("CONTROL - Temperatura de trabajo Heladera Doble 2: ");
+    Serial.println(setTemp2);
     if (tempNow >= minHela) {
       if (tempNow >= maxHela) {
         digitalWrite(HEL2, LOW);
