@@ -161,7 +161,7 @@ void readTemp1() {
   temp1 = sensor1.readTemperature();
 
   if (isnan(temp1)) {
-    Serial.println("Error: Failed to read temperature from sensor 1");
+    Serial.println("****ERROR****: Failed to read temperature from sensor 1");
     temperature1 = NAN;
     return;
   }
@@ -176,7 +176,7 @@ void readTemp2() {
   temp2 = sensor2.readTemperature();
 
   if (isnan(temp2)) {
-    Serial.println("Error: Failed to read temperature from sensor 2");
+    Serial.println("****ERROR****: Failed to read temperature from sensor 2");
     temperature2 = NAN;
     return;
   }

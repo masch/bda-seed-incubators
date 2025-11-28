@@ -24,14 +24,6 @@ void firebaseSetup() {
   auth.user.email = FIREBASE_USER_EMAIL;
   auth.user.password = FIREBASE_USER_PASSWORD;
 
-  Serial.printf("API Key: %s\r\n", config.api_key.c_str());
-
-  Serial.printf("Database URL: %s\r\n", config.database_url.c_str());
-
-  Serial.printf("User Email: %s\r\n", auth.user.email.c_str());
-
-  Serial.printf("User Password: %s\r\n", auth.user.password.c_str());
-
   // Set timeouts (in ms)
   config.timeout.socketConnection = 10000;
   config.timeout.serverResponse = 10000;
