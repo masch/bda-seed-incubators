@@ -242,7 +242,6 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
 
 void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp,
                   float tempNow) {
-  Serial.println("ControlTemp2");
 
   if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 2");
