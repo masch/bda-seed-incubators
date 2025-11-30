@@ -1,18 +1,16 @@
 #include <Arduino.h>
 #include <DHT.h>
-#include <bda/env.h>
-#include <bda/firmware.h>
-#include <bda/network.h>
-#include <math.h>
-#include <stdlib.h>
-
-#include "addons/TokenHelper.h"
 #include <Firebase_ESP_Client.h>
 #include <HTTPClient.h>
 #include <NTPClient.h>
 #include <Update.h>
 #include <WiFi.h>
+#include <bda/env.h>
+#include <bda/firmware.h>
+#include <bda/network.h>
 #include <floatToString.h>
+#include <math.h>
+#include <stdlib.h>
 
 // Pin definitons
 #define S1 18
@@ -27,9 +25,9 @@
 // Sensor definitions
 #define DHTTYPE DHT22
 DHT sensor1(S1, DHTTYPE);
-const char *SENOR_1_NAME = "S1";
+const char* SENOR_1_NAME = "S1";
 DHT sensor2(S2, DHTTYPE);
-const char *SENOR_2_NAME = "S2";
+const char* SENOR_2_NAME = "S2";
 
 // WiFi Definitions
 const String bdaApiURL = BDA_API_URL;
@@ -40,11 +38,6 @@ String getTemp2 = bdaApiURL + "/v1/heladera-doble-2/gettemp";
 String updateTemp2 = bdaApiURL + "/v1/heladera-doble-2/updatetemp";
 
 unsigned long lastMillis;
-
-// Firebase Definitions
-// FirebaseData fbdo;
-// FirebaseAuth auth;
-// FirebaseConfig config;
 
 // Flags
 bool taskCompleted = false;
@@ -78,83 +71,10 @@ float maxTempLamp2 = setTemp2 - 0.5;
 float temperature1, temperature2;
 float temp1, temp2;
 
-class Log {
-public:
-  double temperatureLog;
-  String timestampLog;
-};
-
-Log TempLog1;
-Log TempLog2;
-
-/*void wifiSetup(const char *ssid, const char *passWifi)
-{
-  int connStatus = 0;
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, passWifi);
-  Serial.println("Conectando a Wifi");
-  delay(500);
-  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
-  delay(500);
-  for (int i = 0; i < 10; i++)
-  {
-    if (WiFi.status() != WL_CONNECTED)
-    {
-      Serial.print('.');
-      delay(1000);
-    }
-    else
-    {
-      Serial.println("Conectado al Wifi");
-      connStatus = 1;
-      break;
-    }
-  }
-  if (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.println("Error al conectarse al WiFi");
-    noWiFi = true;
-  }
-  Serial.println(WiFi.localIP());
-}*/
-
 void sensorSetup() {
   sensor1.begin();
   sensor2.begin();
 }
-
-/*
-void firmwareDownload(FCS_DownloadStatusInfo info)
-{
-  if (info.status == fb_esp_fcs_download_status_init)
-  {
-    Serial.printf("New update found\n");
-    Serial.printf("Downloading firmware %s (%d bytes)\n",
-info.remoteFileName.c_str(), info.fileSize);
-  }
-  else if (info.status == fb_esp_fcs_download_status_download)
-  {
-    Serial.printf("Downloaded %d%s\n", (int)info.progress, "%");
-  }
-  else if (info.status == fb_esp_fcs_download_status_complete)
-  {
-    Serial.println("Donwload firmware completed.");
-    Serial.println();
-  }
-  else if (info.status == fb_esp_fcs_download_status_error)
-  {
-    Serial.printf("New firmware update not available or download failed, %s\n",
-info.errorMsg.c_str());
-  }
-}
-*/
-// void firebaseSetup()
-// {
-//   config.api_key = API_KEY;
-//   auth.user.email = USER_EMAIL;
-//   auth.user.password = USER_PASSWORD;
-//   config.token_status_callback = tokenStatusCallback;
-// }
 
 void readTemp1() {
   delay(1000);
@@ -185,8 +105,7 @@ void readTemp2() {
   Serial.println(temperature2);
 }
 
-void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
-                  float tempNow) {
+void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow) {
   if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 1");
     digitalWrite(REL1, HIGH);
@@ -240,9 +159,7 @@ void controlTemp1(float minHela, float maxHela, float minLamp, float maxLamp,
   }
 }
 
-void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp,
-                  float tempNow) {
-
+void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp, float tempNow) {
   if (isnan(tempNow)) {
     Serial.println("Temperatura leida invalida Heladera 2");
     digitalWrite(REL2, HIGH);
@@ -296,68 +213,6 @@ void controlTemp2(float minHela, float maxHela, float minLamp, float maxLamp,
   }
 }
 
-/*
-float getServerTemp(String url, float setTemp)
-{
-  float serverTemp = setTemp;
-
-  http.begin(url.c_str());
-  int responseCode = http.GET();
-  String responseTemp = http.getString();
-
-  if (responseCode == 200)
-  {
-    serverTemp = responseTemp.toFloat();
-  }
-  else
-  {
-    Serial.println("Error: ");
-    Serial.println(responseCode);
-  }
-  Serial.printf("CONTROL - Temperatura leida del Servidor: %f", serverTemp);
-  http.end();
-  return serverTemp;
-}
-
-void updateServerTemp(String url, float newtemp)
-{
-  char buffer[6];
-  String sentTemp = floatToString(newtemp, buffer, 6, 2);
-
-  http.begin(url.c_str());
-  http.addHeader("temp", sentTemp);
-  int responseCode = http.POST("");
-
-  if (responseCode == 200)
-  {
-    Serial.println("Temperatura enviada correctamente a servidor");
-  }
-  else
-  {
-    Serial.println("Error: ");
-    Serial.print(responseCode);
-  }
-  http.end();
-}
-
-void modeSetup(String url)
-{
-  http.begin(url.c_str());
-  int response = http.GET();
-  Serial.print(response);
-  if (noWiFi != true && response == 200)
-  {
-    offlineMode = false;
-    Serial.println("Inicalizado en modo ONLINE");
-  }
-  else
-  {
-    Serial.println("Inicializado en modo OFFLINE");
-  }
-  http.end();
-}
-*/
-
 void tempsUpdate(float tempNow1, float tempNow2) {
   minTempHela1 = tempNow1 + 0.2;
   maxTempHela1 = tempNow1 + 0.5;
@@ -383,10 +238,8 @@ void subRoutine1Online() {
   if (!isnan(temperature2)) {
     updateServerTemp(updateTemp2, SENOR_2_NAME, temperature2);
   }
-  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1,
-               temperature1);
-  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2,
-               temperature2);
+  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
+  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
   delay(1000);
 }
 
@@ -394,27 +247,9 @@ void subRoutine1Offline() {
   readTemp1();
   delay(500);
   readTemp1();
-  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1,
-               temperature1);
-  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2,
-               temperature2);
+  controlTemp1(minTempHela1, maxTempHela1, minTempLamp1, maxTempLamp1, temperature1);
+  controlTemp2(minTempHela2, maxTempHela2, minTempLamp2, maxTempLamp2, temperature2);
   delay(1000);
-}
-
-void subRoutine2(void *pvParameters) {
-  while (1) {
-    while (!timeClient.update()) {
-      timeClient.forceUpdate();
-    }
-    formattedDate = timeClient.getFormattedTime();
-
-    TempLog1.timestampLog = hourTime;
-    TempLog1.temperatureLog = temperature1;
-    TempLog2.timestampLog = hourTime;
-    TempLog2.temperatureLog = temperature2;
-    // Serial.println("Timestamp"); Serial.print(TempLog.timestampLog);
-    delay(700);
-  }
 }
 
 void setup() {
@@ -454,44 +289,6 @@ void setup() {
   if (!offlineMode) {
     firebaseSetup();
   }
-
-  // Firebase.begin(&config, &auth);
-  // config.fcs.download_buffer_size = 2048;
-  // Firebase.reconnectWiFi(true);
-
-  // if (Firebase.ready() && !taskCompleted)
-  // {
-  //   taskCompleted = true;
-  //   Serial.println("\nChecking for new firmware update available...\n");
-
-  //   if (!Firebase.Storage.downloadOTA(
-  //           &fbdo, STORAGE_BUCKET_ID,
-  //           FIRMWARE_PATH,
-  //           firmwareDownload))
-  //   {
-  //     Serial.println(fbdo.errorReason());
-  //   }
-  //   else
-  //   {
-  //     Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo,
-  //     STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
-  //     Serial.println("Restarting...\n\n");
-  //     delay(2000);
-  //     ESP.restart();
-  //   }
-  // }
-
-  /*if(!offlineMode){
-   xTaskCreatePinnedToCore (
-    subRoutine2,
-    "Logging",
-    20000,
-    NULL,
-    0,
-    NULL,
-    1
-  );
-  }*/
 }
 
 void loop() {

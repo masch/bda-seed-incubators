@@ -1,9 +1,9 @@
 #ifndef _BDA_FIRMWARE_H
 #define _BDA_FIRMWARE_H
 
-#include "addons/TokenHelper.h"
 #include <Firebase_ESP_Client.h>
 #include <HTTPClient.h>
+#include <addons/TokenHelper.h>
 #include <bda/env.h>
 
 // Firebase instance
