@@ -3,7 +3,7 @@
 connect-esp32:
 	tio /dev/ttyUSB0 -b 115200
 
-buld-generate-compiledb:
+build-generate-compiledb:
 	pio run -t compiledb
 
 build:
@@ -21,7 +21,7 @@ upload:
 	killall tio & pio run -t upload -e nodemcu-32s && tio /dev/ttyUSB0 -b 115200
 
 kill-tio:
-	killall tio	
+	killall tio || true
 
 kill-upload: kill-tio upload
 

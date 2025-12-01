@@ -1,7 +1,10 @@
-.PHONY: connect-esp32 build clean rebuild upload kill-tio kill-upload
+.PHONY: connect-esp32 build clean rebuild upload kill-tio kill-upload build-generate-compiledb reboot
 
 connect-esp32:
 	tio /dev/ttyUSB0 -b 115200
+
+build-generate-compiledb:
+	pio run -t compiledb
 
 build:
 	pio run -e nodemcu-32s && cp .pio/build/nodemcu-32s/firmware.bin .pio/build/nodemcu-32s/simple-seed-incubator-v3.0.X.bin
@@ -10,6 +13,9 @@ clean:
 	pio run -t clean
 
 rebuild: clean build
+
+reboot:
+	esptool --port /dev/ttyUSB0 --no-stub flash_id
 
 upload:
 	killall tio & pio run -t upload -e nodemcu-32s && tio /dev/ttyUSB0 -b 115200
