@@ -1,4 +1,4 @@
-.PHONY: connect-esp32 build clean rebuild upload kill-tio kill-upload
+.PHONY: connect-esp32 build clean rebuild upload kill-tio kill-upload build-generate-compiledb reboot
 
 connect-esp32:
 	tio /dev/ttyUSB0 -b 115200

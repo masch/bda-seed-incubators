@@ -21,6 +21,8 @@ upload:
 	killall tio & pio run -t upload -e nodemcu-32s && tio /dev/ttyUSB0 -b 115200
 
 kill-tio:
-	killall tio	
+	killall tio || true
 
 kill-upload: kill-tio upload
+
+reboot-connect: kill-tio reboot connect-esp32
