@@ -2,3 +2,4 @@
 **/.vscode/
 **/private_config.ini
 **/.gitignore
+**/compile_commands.json
