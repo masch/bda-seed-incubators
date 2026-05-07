@@ -1,20 +1,20 @@
-#include <Arduino.h>
-#include <stdlib.h>
 #include <Adafruit_MAX31865.h>
-#include <math.h>
+#include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
+#include <math.h>
+#include <stdlib.h>
 // #include <env.h>
 // #include <bosquesFramework.h>
 #include <bda/firmware.h>
 #include <bda/network.h>
 
-#include <WiFi.h>
+#include "addons/TokenHelper.h"
+#include <Firebase_ESP_Client.h>
 #include <HTTPClient.h>
 #include <Update.h>
-#include <Firebase_ESP_Client.h>
+#include <WiFi.h>
 #include <floatToString.h>
-#include "addons/TokenHelper.h"
 
 // Pin definitons
 #define CS 27  // Violeta
@@ -30,6 +30,7 @@ float ratio;
 uint16_t RTD;
 double temperature;
 float RREF = 430.0;
+const char *SENSOR_1_NAME = "S1";
 
 // WiFi Definitions
 const String bdaApiURL = BDA_API_URL;
@@ -63,81 +64,63 @@ Adafruit_MAX31865 tempReader = Adafruit_MAX31865(27, 23, 19, 18);
 max31865_fault_cycle_t maxFault = MAX31865_FAULT_AUTO;
 max31865_numwires_t wires = MAX31865_3WIRE;
 
-void sensorSetup()
-{
+void sensorSetup() {
   uint8_t fault = tempReader.readFault();
-  if (fault)
-  {
+  if (fault) {
     Serial.print("Fault 0x");
     Serial.println(fault, HEX);
-    if (fault & MAX31865_FAULT_HIGHTHRESH)
-    {
+    if (fault & MAX31865_FAULT_HIGHTHRESH) {
       Serial.println("RTD High Threshold");
       error = true;
     }
-    if (fault & MAX31865_FAULT_LOWTHRESH)
-    {
+    if (fault & MAX31865_FAULT_LOWTHRESH) {
       Serial.println("RTD Low Threshold");
       error = true;
     }
-    if (fault & MAX31865_FAULT_REFINLOW)
-    {
+    if (fault & MAX31865_FAULT_REFINLOW) {
       Serial.println("REFIN- > 0.85 x Bias");
       error = true;
     }
-    if (fault & MAX31865_FAULT_REFINHIGH)
-    {
+    if (fault & MAX31865_FAULT_REFINHIGH) {
       Serial.println("REFIN- < 0.85 x Bias - FORCE- open");
       error = true;
     }
-    if (fault & MAX31865_FAULT_RTDINLOW)
-    {
+    if (fault & MAX31865_FAULT_RTDINLOW) {
       Serial.println("RTDIN- < 0.85 x Bias - FORCE- open");
       error = true;
     }
-    if (fault & MAX31865_FAULT_OVUV)
-    {
+    if (fault & MAX31865_FAULT_OVUV) {
       Serial.println("Under/Over voltage");
       error = true;
     }
     tempReader.clearFault();
 
-    while (error == true)
-    {
+    while (error == true) {
       Serial.println("Error al inciar el sensor, reiniciando");
-      for (int i = 0; i < 9; i++)
-      {
+      for (int i = 0; i < 9; i++) {
         Serial.print(".");
         delay(700);
       }
       ESP.restart();
     }
-  }
-  else
-  {
+  } else {
     Serial.println("Sensor inicializado correctamente");
   }
 }
 
-void firmwareDownload(FCS_DownloadStatusInfo info)
-{
-  if (info.status == fb_esp_fcs_download_status_init)
-  {
+void firmwareDownload(FCS_DownloadStatusInfo info) {
+  if (info.status == fb_esp_fcs_download_status_init) {
     Serial.printf("New update found\n");
-    Serial.printf("Downloading firmware %s (%d bytes)\n", info.remoteFileName.c_str(), info.fileSize);
-  }
-  else if (info.status == fb_esp_fcs_download_status_download)
-  {
+    Serial.printf("Downloading firmware %s (%d bytes)\n",
+                  info.remoteFileName.c_str(), info.fileSize);
+  } else if (info.status == fb_esp_fcs_download_status_download) {
     Serial.printf("Downloaded %d%s\n", (int)info.progress, "%");
-  }
-  else if (info.status == fb_esp_fcs_download_status_complete)
-  {
+  } else if (info.status == fb_esp_fcs_download_status_complete) {
     Serial.println("Donwload firmware completed.");
     Serial.println();
-  }
-  else if (info.status == fb_esp_fcs_download_status_error)
-  {
-    Serial.printf("New firmware update not available or download failed, %s\n", info.errorMsg.c_str());
+  } else if (info.status == fb_esp_fcs_download_status_error) {
+    Serial.printf("New firmware update not available or download failed, %s\n",
+                  info.errorMsg.c_str());
   }
 }
 
@@ -150,76 +133,58 @@ void firmwareDownload(FCS_DownloadStatusInfo info)
   config.max_token_generation_retry = 5;
 }*/
 
-void readTemp()
-{
+void readTemp() {
   temperature = tempReader.temperature(100, RREF);
   Serial.printf("INFO - Temperatura detectada sensor: %f\n", temperature);
 }
 
-void controlTemp(int selected, int tempNow)
-{
+void controlTemp(int selected, int tempNow) {
   int top = selected;
   int bottom = (selected - 1);
-  if (tempNow <= bottom)
-  {
+  if (tempNow <= bottom) {
     digitalWrite(REL, HIGH);
-  }
-  else if (tempNow >= top)
-  {
+  } else if (tempNow >= top) {
     digitalWrite(REL, LOW);
   }
 }
 
-void firstRamp(int cutoff, int treshold)
-{
+void firstRamp(int cutoff, int treshold) {
   digitalWrite(REL, HIGH);
   delay(100);
-  while (firstCicle == true)
-  {
+  while (firstCicle == true) {
     readTemp();
     Serial.println("Temperatura detectada: ");
     Serial.print(temperature);
-    if (temperature > cutoff)
-    {
+    if (temperature > cutoff) {
       digitalWrite(REL, LOW);
       delay(10000);
     }
-    if (temperature > treshold)
-    {
+    if (temperature > treshold) {
       firstCicle = false;
       Serial.print(" Saliendo de rampa inicial");
       break;
-    }
-    else if (REL == LOW && firstCicle == true)
-    {
+    } else if (REL == LOW && firstCicle == true) {
       digitalWrite(REL, HIGH);
     }
     delay(1000);
   }
 }
 
-void tempsUpdate(float tempNow)
-{
+void tempsUpdate(float tempNow) {
   rampCutoff = tempNow - 9;
   rampTreshold = tempNow - 3;
 }
 
-void subRoutineControl()
-{
+void subRoutineControl() {
 
-  if (setTemp < 51)
-  {
+  if (setTemp < 51) {
     lowTempMode = true;
-  }
-  else
-  {
+  } else {
     lowTempMode = false;
   }
 
-  if (lowTempMode == false)
-  {
-    if (setTemp < 150)
-    {
+  if (lowTempMode == false) {
+    if (setTemp < 150) {
       firstRamp(rampCutoff, rampTreshold);
     }
   }
@@ -229,30 +194,23 @@ void subRoutineControl()
   delay(1000);
 }
 
-void subRoutineInternet(void *params)
-{
+void subRoutineInternet(void *params) {
   String *urls = (String *)params;
-  while (true)
-  {
-    if (WiFi.status() != WL_CONNECTED)
-    {
+  while (true) {
+    if (WiFi.status() != WL_CONNECTED) {
       offlineMode = true;
       Serial.println("Sin WiFi, reconectando. ");
       vTaskDelay(5000);
       wifiSetup(WIFI_SSID, WIFI_PASSWORD);
-    }
-    else
-    {
+    } else {
       offlineMode = modeSetup(urls[0]);
-      if (!offlineMode)
-      {
+      if (!offlineMode) {
         vTaskDelay(5000);
         setTemp = getServerTemp(urls[1], setTemp);
         tempsUpdate(setTemp);
-        updateServerTemp(urls[2], temperature);
+        updateServerTemp(urls[2], SENSOR_1_NAME, temperature);
         // if there is a new update, download it
-        if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION))
-        {
+        if (checkForUpdate(DEVICE_NAME, FIRMWARE_VERSION)) {
           downloadAndUpdateFirmware();
         }
       }
@@ -260,8 +218,7 @@ void subRoutineInternet(void *params)
   }
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
 
   SPI.begin();
@@ -280,12 +237,10 @@ void setup()
   noWiFi = wifiSetup(WIFI_SSID, WIFI_PASSWORD);
   modeSetup(bdaApiURL);
 
-  if (!noWiFi)
-  {
+  if (!noWiFi) {
     firebaseSetup();
 
-    if (!offlineMode)
-    {
+    if (!offlineMode) {
       Firebase.begin(&config, &auth);
       config.fcs.download_buffer_size = 2048;
       Firebase.reconnectWiFi(true);
@@ -306,33 +261,23 @@ void setup()
     }
     else
     {
-      Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo, STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
+      Serial.printf("Delete file... %s\n", Firebase.Storage.deleteFile(&fbdo,
+  STORAGE_BUCKET_ID, FIRMWARE_PATH) ? "ok" : fbdo.errorReason().c_str());
       Serial.println("Restarting...\n\n");
       delay(2000);
       ESP.restart();
     }
   }*/
 
-  xTaskCreatePinnedToCore(
-      subRoutineInternet,
-      "Internet Stack",
-      20000,
-      (void *)taskParams,
-      0,
-      NULL,
-      1);
+  xTaskCreatePinnedToCore(subRoutineInternet, "Internet Stack", 20000,
+                          (void *)taskParams, 0, NULL, 1);
 }
 
-void loop()
-{
-  while (error != true)
-  {
-    if (offlineMode)
-    {
+void loop() {
+  while (error != true) {
+    if (offlineMode) {
       Serial.println("## - OFFLINE - ##");
-    }
-    else
-    {
+    } else {
       Serial.println("## - ONLINE - ##");
     }
     subRoutineControl();
