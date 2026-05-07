@@ -4,7 +4,7 @@ connect-esp32:
 	tio /dev/ttyUSB0 -b 115200
 
 build:
-	pio run -e d1_wroom_02 && cp .pio/build/d1_wroom_02/firmware.bin .pio/build/d1_wroom_02/simple-seed-incubator-v3.0.X.bin
+	pio run -e d1_wroom_02 && cp .pio/build/d1_wroom_02/firmware.bin .pio/build/d1_wroom_02/seed-oven-v3.0.X.bin
 
 clean:
 	pio run -t clean
