@@ -17,12 +17,12 @@
 #include <floatToString.h>
 
 // Pin definitons
-#define CS 27  // Violeta
-#define SDI 23 // Azul
-#define SDO 19 // Verde
-#define CLK 18 // Naranja
-#define REL 17 // Gris
-#define ERR 16 // Marron
+#define CS 12  // Violeta
+#define SDI 15 // Azul
+#define SDO 14 // Verde
+#define CLK 13 // Naranja
+#define REL 16 // Gris
+#define ERR 17 // Marron
 
 // Sensor definitions
 double resistance;
