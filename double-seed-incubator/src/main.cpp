@@ -18,7 +18,7 @@
 #define S1 4
 #define S2 5
 #define VEN1 21
-#define HEL1 16 
+#define HEL1 16
 #define REL1 17
 #define VEN2 22
 #define HEL2 18
