@@ -15,14 +15,14 @@
 #include "addons/TokenHelper.h"
 
 // Pin definitons
-#define S1 18
+#define S1 4
 #define S2 5
-#define VEN1 2
-#define HEL1 32
-#define REL1 25
-#define VEN2 4
-#define HEL2 33
-#define REL2 26
+#define VEN1 21
+#define HEL1 16
+#define REL1 17
+#define VEN2 22
+#define HEL2 18
+#define REL2 19
 
 // Sensor definitions
 #define DHTTYPE DHT22
