@@ -178,6 +178,7 @@ void subRoutineInternet(void *params)
 void setup()
 {
   Serial.begin(115200);
+  serialCommandsSetup();
 
   pinMode(REL, OUTPUT);
   pinMode(VEN, OUTPUT);

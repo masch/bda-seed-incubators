@@ -219,6 +219,7 @@ void subRoutineInternet(void *params) {
 
 void setup() {
   Serial.begin(115200);
+  serialCommandsSetup();
 
   SPI.begin();
   SPI.setClockDivider(SPI_CLOCK_DIV16);

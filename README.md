@@ -22,12 +22,36 @@ This repository contains the source code for three projects to control seed incu
 - **Offline Mode**: If the WiFi connection is lost, the devices will continue to operate in offline mode, using the last set temperature or a default temperature.
 - **OTA Firmware Updates**: The firmware of the devices can be updated over-the-air (OTA) using Firebase.
 - **Temperature Control**: The devices use a PID control loop to maintain the desired temperature.
-- **Hardware**: The projects are based on the ESP32 microcontroller. The temperature sensors used are the DHT22 and the MAX31865. The heaters and coolers are controlled by relays.
 
-## Software
+## Hardware Specifications
 
-- **PlatformIO**: The projects are built using the PlatformIO IDE.
-- **Arduino Framework**: The code is written in C++ using the Arduino framework.
+All devices across this project standardize on the same microcontroller module:
+
+- **Microcontroller**: **Espressif ESP32-WROOM-32E**
+  - **CPU**: Xtensa® dual-core 32-bit LX6 microprocessor, up to 240 MHz
+  - **Memory**: 520 KB SRAM, 448 KB ROM, 4 MB SPI Flash
+  - **Wireless**: 2.4 GHz Wi-Fi (802.11 b/g/n) + Bluetooth® 4.2 / BLE
+  - **Operating System**: Native FreeRTOS multitasking
+
+### Device Hardware Matrix
+
+| Device | Microcontroller | Temperature Sensor | Actuators |
+| :--- | :--- | :--- | :--- |
+| **Simple Seed Incubator** | ESP32-WROOM-32E | DHT22 (Digital AM2302) | Relays (Heater, Cooler, Fan) |
+| **Double Seed Incubator** | ESP32-WROOM-32E | 2x DHT22 (Dual chamber) | Relays (Dual Heater, Cooler, Fan) |
+| **Seed Oven** | ESP32-WROOM-32E | MAX31865 (Precision RTD PT100/PT1000) | Relays (Heating elements) |
+
+## Software & Tooling
+
+- **PlatformIO**: Embedded build system supporting local and Fedora Silverblue / Toolbox container environments.
+- **Arduino Framework & FreeRTOS**: Multi-tasking application stack running networking and control loops on separate cores/tasks.
+- **Unified Makefiles**: Standardized targets across all projects:
+  - `make build`: Compile firmware into `.bin`.
+  - `make upload`: Upload firmware to ESP32 over serial.
+  - `make reboot`: Software reboot via serial command (`r`).
+  - `make reboot-connect`: Reboot and open serial monitor (`tio`).
+  - `make setup-permissions`: Install official PlatformIO udev rules for serial access.
+  - `make setup-toolbox`: Provision Toolbox container dependencies automatically.
 
 ## Getting Started
 

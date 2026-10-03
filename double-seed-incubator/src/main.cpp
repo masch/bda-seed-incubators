@@ -428,6 +428,7 @@ void subRoutine2(void *pvParameters)
 void setup()
 {
   Serial.begin(115200);
+  serialCommandsSetup();
 
   pinMode(REL1, OUTPUT);
   pinMode(VEN1, OUTPUT);
