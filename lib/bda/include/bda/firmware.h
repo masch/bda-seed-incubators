@@ -134,4 +134,35 @@ void downloadAndUpdateFirmware()
     http.end();
 }
 
-#endif // _BDA_NETWORK_H
+#if defined(ESP32)
+void serialCommandsTask(void *params)
+{
+    while (true)
+    {
+        if (Serial.available())
+        {
+            char c = Serial.read();
+            if (c == 'r' || c == 'R')
+            {
+                Serial.println("Reinicio solicitado por puerto serie...");
+                ESP.restart();
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+void serialCommandsSetup()
+{
+    xTaskCreate(
+        serialCommandsTask,
+        "SerialCmd",
+        2048,
+        NULL,
+        1,
+        NULL
+    );
+}
+#endif
+
+#endif // _BDA_FIRMWARE_H
